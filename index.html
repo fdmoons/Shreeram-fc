@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Neon Sky Admin</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        --bg-dark: #09090b; /* Very dark grey/black */
+        --glass-bg: rgba(20, 20, 20, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        
+        /* Neon Sky Theme Colors */
+        --theme-fc: #06b6d4; /* Cyan / Sky Blue */
+        --theme-rn: #10b981; /* Emerald */
+        
+        --accent: var(--theme-fc);
+        --accent-glow: rgba(6, 182, 212, 0.4); /* Sky Blue Glow */
+    }
+
+    /* Dynamic Theme Switching */
+    body.theme-fc { --accent: var(--theme-fc); --accent-glow: rgba(6, 182, 212, 0.4); }
+    body.theme-rn { --accent: var(--theme-rn); --accent-glow: rgba(16, 185, 129, 0.4); }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+    body {
+        margin: 0;
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* --- BACKGROUND ORBS (Subtle) --- */
+    .bg-glow {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+        background: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 50%);
+        transition: 0.5s ease;
+        opacity: 0.2;
+    }
+
+    /* --- GLASS CARDS --- */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
+
+    h2 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+    h3 { font-size: 16px; margin: 0 0 12px 0; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+    /* --- INPUTS & BUTTONS --- */
+    input {
+        width: 100%; padding: 12px 14px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        color: #fff; font-family: inherit; font-size: 14px;
+        margin-bottom: 12px; transition: 0.2s;
+    }
+    input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .btn {
+        width: 100%; padding: 12px; border: none; border-radius: 12px;
+        font-weight: 600; font-size: 14px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: 0.2s;
+    }
+    
+    .btn-primary {
+        background: var(--accent);
+        color: #000; /* Black text on neon looks better */
+        box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-icon { width: 40px; padding: 0; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); }
+    
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; width: auto; }
+    .btn-outline-danger { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
+
+    /* --- TABS --- */
+    .nav-tabs {
+        display: flex; background: rgba(255,255,255,0.03); padding: 4px;
+        border-radius: 14px; border: 1px solid var(--glass-border); margin-bottom: 15px;
+    }
+    .nav-item {
+        flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+        font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s;
+    }
+    .nav-item.active {
+        background: var(--accent); color: #000;
+        box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* --- HEADER & MINI STATS (NEW) --- */
+    .header-group {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+    }
+    .balance-badge {
+        font-size: 14px; font-weight: 700; color: var(--accent);
+        background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 20px;
+        border: 1px solid var(--glass-border);
+    }
+
+    /* The new Mini Bar */
+    .mini-stats-bar {
+        display: flex; justify-content: space-between; gap: 10px;
+        background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+        padding: 10px 15px; border-radius: 14px; margin-bottom: 20px;
+    }
+    .mini-stat {
+        display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted);
+    }
+    .mini-stat strong { color: #fff; font-size: 14px; }
+
+    /* --- LIST --- */
+    .key-row {
+        background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+        border-left: 3px solid transparent;
+        border-radius: 14px; padding: 14px; margin-bottom: 10px;
+        transition: 0.2s;
+    }
+    .key-row.active { border-left-color: #10b981; }
+    .key-row.expired { border-left-color: #f59e0b; opacity: 0.8; }
+    .key-row.banned { border-left-color: #ef4444; }
+
+    .key-text {
+        font-family: monospace; font-size: 14px; color: var(--accent);
+        background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px;
+        display: flex; justify-content: space-between; align-items: center; margin: 8px 0;
+    }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+    /* --- FAB & MODALS --- */
+    .fab {
+        position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px;
+        background: var(--accent); color: #000; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center; font-size: 22px;
+        box-shadow: 0 0 20px var(--accent-glow); cursor: pointer; z-index: 100;
+        transition: transform 0.2s;
+    }
+    .fab:active { transform: scale(0.9); }
+    .fab.disabled { background: #333; color: #555; box-shadow: none; pointer-events: none; }
+
+    .modal-overlay {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+        align-items: center; justify-content: center; backdrop-filter: blur(5px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+        background: #111; border: 1px solid var(--glass-border); width: 90%; max-width: 350px;
+        padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    
+    #toast {
+        visibility: hidden; min-width: 200px; background: #222; color: #fff; text-align: center; 
+        border-radius: 50px; padding: 10px 20px; position: fixed; z-index: 3000; 
+        left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; border: 1px solid var(--glass-border);
+    }
+    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+</style>
+</head>
+<body class="theme-fc">
+
+    <div class="bg-glow"></div>
+    <div id="loader"><div class="spinner"></div></div>
+    <div id="toast">Saved</div>
+
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-card" style="border-color: #ef4444;">
+            <h3 style="color:#ef4444; justify-content:center;"><i class="fa-solid fa-trash"></i> Delete?</h3>
+            <p style="text-align:center; color:#888; margin-bottom:15px; font-size:13px;">Cannot be undone.</p>
+            <div id="refundBadge" style="text-align:center; margin-bottom:15px;"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" style="background:#333; color:#fff;" onclick="closeDeleteModal()">No</button>
+                <button class="btn" style="background:#ef4444; color:#fff;" onclick="confirmDelete()">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="walletModal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Manage Wallets</h3>
+            <div id="walletList" style="max-height: 300px; overflow-y: auto; margin-bottom:15px;"></div>
+            <button class="btn btn-outline-danger" onclick="closeWalletModal()">Close</button>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <div id="loginBox" class="glass-card" style="margin-top: 25vh; text-align: center;">
+            <h2 style="color:var(--accent); margin-bottom:5px;">Admin Login</h2>
+            <p style="margin-bottom:20px;">Access your panel</p>
+            <input id="email" type="email" placeholder="Email">
+            <input id="pass" type="password" placeholder="Password">
+            <button class="btn btn-primary" onclick="login()">Enter</button>
+        </div>
+
+        <div id="panel" style="display:none">
+            
+            <div class="header-group">
+                <div>
+                    <h2 id="roleTitle" style="font-size:20px;">Panel</h2>
+                    <span style="font-size:12px; color:var(--text-muted);">Welcome Back</span>
+                </div>
+                <div id="amountBox" class="balance-badge">Due: ₹0</div>
+            </div>
+
+            <div class="nav-tabs">
+                <div id="tab_FC" class="nav-item active" onclick="switchMode('FC')">FC</div>
+                <div id="tab_RN" class="nav-item" onclick="switchMode('RN')">RN</div>
+            </div>
+
+            <div class="mini-stats-bar">
+                <div class="mini-stat">
+                    <i class="fa-solid fa-tag" style="color:var(--accent)"></i>
+                    <span>Price: <strong id="priceDisplay">₹2500</strong></span>
+                </div>
+                <div style="width:1px; background:var(--glass-border);"></div>
+                <div class="mini-stat">
+                    <i class="fa-solid fa-chart-pie" style="color:var(--accent)"></i>
+                    <span>Limit: <strong id="limitDisplay">₹10000</strong></span>
+                </div>
+            </div>
+
+            <div id="limitMsg" class="glass-card" style="border-color:#ef4444; background:rgba(239,68,68,0.1); display:none; padding:10px; text-align:center;">
+                <small style="color:#ef4444; font-weight:700;"><i class="fa-solid fa-circle-exclamation"></i> Limit Reached. Pay dues.</small>
+            </div>
+
+            <div class="glass-card" style="padding: 12px;">
+                <div style="display: flex; gap: 8px;">
+                    <input id="searchBox" placeholder="Search..." oninput="render()" style="margin:0; font-size:13px;">
+                    <button class="btn btn-outline-danger" style="width: auto;" onclick="logout()">
+                        <i class="fa-solid fa-power-off"></i>
+                    </button>
+                </div>
+                <div id="adminControls" style="display:none; margin-top:10px;">
+                    <button class="btn btn-sm" style="background:#333; color:#fff;" onclick="openWalletModal()">Manage Users</button>
+                </div>
+            </div>
+
+            <div id="addForm" class="glass-card" style="display:none; border-color:var(--accent);">
+                <h3 style="color:var(--accent); font-size:15px;">Create License</h3>
+                <input id="device" placeholder="Device ID">
+                <input id="nickname" placeholder="Name (Optional)">
+                <div style="display: flex; gap: 8px; margin-bottom:12px;">
+                    <input id="keyval" placeholder="Key" style="margin:0;">
+                    <button class="btn btn-icon" onclick="keyval.value=generateKey()"><i class="fa-solid fa-arrows-rotate"></i></button>
+                </div>
+                <button class="btn btn-primary" onclick="addKey()">Generate</button>
+            </div>
+
+            <div id="list"></div>
+
+            <div id="fabBtn" class="fab" onclick="toggleAddForm()">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+        </div>
+    </div>
+
+<script>
+const _0x1b356a=_0x3c69;(function(_0x57293c,_0x183554){const _0x2f52e5=_0x3c69,_0x200712=_0x57293c();while(!![]){try{const _0x111ba4=parseInt(_0x2f52e5(0x1ce))/0x1+parseInt(_0x2f52e5(0x1fa))/0x2*(-parseInt(_0x2f52e5(0x182))/0x3)+parseInt(_0x2f52e5(0x1a2))/0x4+-parseInt(_0x2f52e5(0x1f5))/0x5+parseInt(_0x2f52e5(0x1da))/0x6+-parseInt(_0x2f52e5(0x1d5))/0x7*(parseInt(_0x2f52e5(0x1f4))/0x8)+-parseInt(_0x2f52e5(0x1d4))/0x9;if(_0x111ba4===_0x183554)break;else _0x200712['push'](_0x200712['shift']());}catch(_0x2186f1){_0x200712['push'](_0x200712['shift']());}}}(_0x216b,0xd8529));const MODES={'FC':{'db':_0x1b356a(0x194),'payRefPath':_0x1b356a(0x176),'price':0x9c4,'limit':0x2710,'name':'FC','theme':'theme-fc'},'RN':{'db':_0x1b356a(0x1a3),'payRefPath':_0x1b356a(0x19f),'price':0x708,'limit':0x1770,'name':'RN','theme':_0x1b356a(0x188)}};let CURRENT_MODE='FC';window[_0x1b356a(0x1dc)]=()=>{const _0x234bc7=_0x1b356a;setTimeout(()=>document[_0x234bc7(0x17f)]('loader')[_0x234bc7(0x1eb)][_0x234bc7(0x1d8)]='none',0x1f4);};function showToast(_0x3d3911){const _0x2d89fc=_0x1b356a,_0x1bf2ec=document['getElementById'](_0x2d89fc(0x1c4));_0x1bf2ec[_0x2d89fc(0x191)]=_0x3d3911,_0x1bf2ec[_0x2d89fc(0x1c3)]=_0x2d89fc(0x180),setTimeout(()=>_0x1bf2ec[_0x2d89fc(0x1c3)]=_0x1bf2ec[_0x2d89fc(0x1c3)][_0x2d89fc(0x1fb)]('show',''),0xbb8);}const firebaseConfig={'apiKey':_0x1b356a(0x1a7),'authDomain':'shreeram-605be.firebaseapp.com','databaseURL':_0x1b356a(0x19c),'projectId':_0x1b356a(0x1f2)};firebase[_0x1b356a(0x1ff)](firebaseConfig);function _0x216b(){const _0x2ad426=['off','style','Exp','\x27)\x22>Save</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x22\x20style=\x22background:#333;\x20color:#fff;\x22\x20onclick=\x22cancelEdit()\x22>Cancel</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','Ban','input_','\x22></span>','walletModal','shreeram-605be','payRefPath','8iGHRWH','1356090FRfxOG','#ef4444','\x27)\x22>Edit</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x20btn-outline-danger\x22\x20onclick=\x22openDeleteModal(\x27','toISOString','e_exp_','10OOsldY','replace','</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20gap:5px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22input_','sort','remove','initializeApp','\x27)\x22><i\x20class=\x22fa-solid\x20fa-trash\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','\x22\x20value=\x22','Unban','classList','loginBox','Saved','payments','value','\x22\x20style=\x22margin-bottom:5px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_key_','val','<div\x20style=\x22text-align:center;\x20padding:30px;\x20color:#555;\x22>No\x20keys</div>','disabled','searchBox','then','Unknown','getElementById','show','expiry_date','984285XgIwjl','getDate','Missing\x20ID','email','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-row\x20active\x22\x20style=\x22border-color:var(--accent)\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_nick_','set','theme-rn','Deleted','adminControls','owner_uid','querySelectorAll','#10b981','forEach','addForm','onAuthStateChanged','innerText','created_at','e_nick_','database','active','key','device','</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x22\x20style=\x22background:rgba(255,255,255,0.05);\x20color:#fff;\x22\x20onclick=\x22enableEdit(\x27','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fa-regular\x20fa-copy\x22\x20style=\x22cursor:pointer;\x20color:#fff;\x22\x20onclick=\x22copyKey(\x27','substring','auth','https://shreeram-605be-default-rtdb.asia-southeast1.firebasedatabase.app','Limit\x20Reached','<span\x20style=\x22color:#555;\x20font-size:11px;\x22>No\x20refund\x20(Old\x20Key)</span>','payments_RN','length','toUpperCase','5699772vRHJwN','NMSKYC/database','</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20gap:5px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x22\x20style=\x22background:rgba(255,255,255,0.05);\x20color:#fff;\x22\x20onclick=\x22toggleStatus(\x27','amountBox','en-GB','AIzaSyAWf9xRzBJAcAUBCNgGrLPPbRVnYMHvuj4','\x27)\x22>','pass','device_id','toLowerCase','child','theme','\x22\x20style=\x22width:60px;\x20margin:0;\x20padding:5px;\x20height:30px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-primary\x20btn-sm\x22\x20onclick=\x22updateUserBalance(\x27','signOut','limitMsg','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;\x20color:#888;\x20margin-top:2px;\x22>ID:\x20','Total\x20Due:\x20₹','flex','walletList','loader','fabBtn','list','once','Reseller','deleteModal','.nav-item','\x27)\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20align-items:center;\x20margin-top:10px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small\x20style=\x22color:#666;\x22>','nickname','roleTitle','banned','uid','e_key_','hasChild','className','toast','innerHTML','includes','tab_','signInWithEmailAndPassword','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;\x20display:flex;\x20align-items:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22status-dot\x22\x20style=\x22background:','setDate','limit','\x20style=\x22margin-bottom:5px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_exp_','\x20style=\x22margin-bottom:5px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_dev_','1039740WHMMWg','refundBadge','priceDisplay','writeText','clipboard','<span\x20style=\x22background:var(--accent);\x20color:#000;\x20padding:4px\x208px;\x20border-radius:4px;\x20font-size:11px;\x20font-weight:bold;\x22>Refund:\x20₹','6423777AmyEvB','1200073ymnFbV','split','add','display','catch','7309554fiukuR','keyval','onload','</span>','is_active','open','e_dev_','price','block','keys','\x27)\x22>Set</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','random','rhgKYPaqq2Pnpgt2pkuccAZcMxB3','none','...<br><span\x20style=\x22color:#fff;\x20font-size:14px;\x22>₹','Added'];_0x216b=function(){return _0x2ad426;};return _0x216b();}const SUPER_ADMIN_UID=_0x1b356a(0x1e6);let CURRENT_UID=null,IS_SUPER=![],db=null,payRef=null,DATA={},USER_BALANCE=0x0,EDIT_ID=null,TARGET_DELETE_ID=null;function switchMode(_0xf01c28){const _0x299556=_0x1b356a;CURRENT_MODE=_0xf01c28;const _0x1dfc8a=MODES[_0xf01c28];document['body'][_0x299556(0x1c3)]=_0x1dfc8a[_0x299556(0x1ad)],document[_0x299556(0x18c)](_0x299556(0x1bb))[_0x299556(0x18e)](_0x563286=>_0x563286[_0x299556(0x173)][_0x299556(0x1fe)](_0x299556(0x195))),document[_0x299556(0x17f)](_0x299556(0x1c7)+_0xf01c28)[_0x299556(0x173)][_0x299556(0x1d7)](_0x299556(0x195)),document[_0x299556(0x17f)](_0x299556(0x1d0))[_0x299556(0x191)]='₹'+_0x1dfc8a['price'],document['getElementById']('limitDisplay')['innerText']='₹'+_0x1dfc8a[_0x299556(0x1cb)];if(db)db[_0x299556(0x1ea)]();if(payRef)payRef[_0x299556(0x1ea)]();if(payRef&&!IS_SUPER)payRef[_0x299556(0x1ac)](CURRENT_UID)[_0x299556(0x1ea)]();db=firebase['database']()['ref'](_0x1dfc8a['db']),payRef=firebase['database']()['ref'](_0x1dfc8a[_0x299556(0x1f3)]),loadData(),loadPayments();}firebase[_0x1b356a(0x19b)]()[_0x1b356a(0x190)](_0x448da7=>{const _0x4705d6=_0x1b356a;_0x448da7&&(CURRENT_UID=_0x448da7[_0x4705d6(0x1c0)],document[_0x4705d6(0x17f)](_0x4705d6(0x174))['style'][_0x4705d6(0x1d8)]='none',document[_0x4705d6(0x17f)]('panel')[_0x4705d6(0x1eb)][_0x4705d6(0x1d8)]=_0x4705d6(0x1e2),_0x448da7[_0x4705d6(0x1c0)]===SUPER_ADMIN_UID?(IS_SUPER=!![],document[_0x4705d6(0x17f)](_0x4705d6(0x1be))['innerText']='Super\x20Admin',document['getElementById'](_0x4705d6(0x18a))[_0x4705d6(0x1eb)][_0x4705d6(0x1d8)]=_0x4705d6(0x1e2)):(document['getElementById'](_0x4705d6(0x1be))[_0x4705d6(0x191)]=_0x4705d6(0x1b9),document[_0x4705d6(0x17f)]('adminControls')['style'][_0x4705d6(0x1d8)]=_0x4705d6(0x1e7)),switchMode('FC'));});function login(){const _0x3cae0d=_0x1b356a,_0x497585=document['getElementById'](_0x3cae0d(0x185))[_0x3cae0d(0x177)],_0x2d54bd=document[_0x3cae0d(0x17f)](_0x3cae0d(0x1a9))[_0x3cae0d(0x177)];document[_0x3cae0d(0x17f)](_0x3cae0d(0x1b5))['style'][_0x3cae0d(0x1d8)]=_0x3cae0d(0x1b3),firebase[_0x3cae0d(0x19b)]()[_0x3cae0d(0x1c8)](_0x497585,_0x2d54bd)[_0x3cae0d(0x17d)](()=>{const _0x21e1ff=_0x3cae0d;document[_0x21e1ff(0x17f)](_0x21e1ff(0x1b5))[_0x21e1ff(0x1eb)][_0x21e1ff(0x1d8)]=_0x21e1ff(0x1e7);})[_0x3cae0d(0x1d9)](_0xebd096=>{const _0x658ce5=_0x3cae0d;document['getElementById'](_0x658ce5(0x1b5))[_0x658ce5(0x1eb)][_0x658ce5(0x1d8)]='none',showToast(_0xebd096['message']);});}function logout(){const _0x53e722=_0x1b356a;firebase[_0x53e722(0x19b)]()[_0x53e722(0x1af)](),location['reload']();}function generateKey(){const _0x4a3579=_0x1b356a;return'KEY-'+Math[_0x4a3579(0x1e5)]()['toString'](0x24)[_0x4a3579(0x19a)](0x2,0x8)[_0x4a3579(0x1a1)]();}function toggleAddForm(){const _0x5e9f7b=_0x1b356a,_0x74250d=MODES[CURRENT_MODE];if(USER_BALANCE>=_0x74250d[_0x5e9f7b(0x1cb)]&&!IS_SUPER){showToast(_0x5e9f7b(0x19d));return;}const _0x1c8a6d=document['getElementById']('addForm');_0x1c8a6d[_0x5e9f7b(0x1eb)][_0x5e9f7b(0x1d8)]=_0x1c8a6d[_0x5e9f7b(0x1eb)][_0x5e9f7b(0x1d8)]===_0x5e9f7b(0x1e7)?_0x5e9f7b(0x1e2):_0x5e9f7b(0x1e7);}function addKey(){const _0x19dadf=_0x1b356a,_0x57c419=MODES[CURRENT_MODE];if(!IS_SUPER&&USER_BALANCE>=_0x57c419[_0x19dadf(0x1cb)]){showToast('Limit\x20Reached!');return;}const _0x571a7e=document[_0x19dadf(0x17f)](_0x19dadf(0x197)),_0xef1c9=document['getElementById'](_0x19dadf(0x1bd)),_0x1a519a=document[_0x19dadf(0x17f)](_0x19dadf(0x1db));if(!_0x571a7e[_0x19dadf(0x177)]||!_0x1a519a['value']){showToast(_0x19dadf(0x184));return;}let _0x18d52b=new Date();_0x18d52b[_0x19dadf(0x1ca)](_0x18d52b[_0x19dadf(0x183)]()+0x1e);const _0xc3736={'device_id':_0x571a7e['value'],'nickname':_0xef1c9['value'],'key':_0x1a519a[_0x19dadf(0x177)],'expiry_date':_0x18d52b['toLocaleDateString'](_0x19dadf(0x1a6)),'created_at':new Date()[_0x19dadf(0x1f8)]()['split']('T')[0x0],'is_active':!![],'owner_uid':CURRENT_UID};db[_0x19dadf(0x1b8)]('value',_0xbea6d3=>{const _0x42c9c9=_0x19dadf;let _0x275f1f=0x0;while(_0xbea6d3[_0x42c9c9(0x1c2)](_0x275f1f['toString']())){_0x275f1f++;}db[_0x42c9c9(0x1ac)](_0x275f1f)[_0x42c9c9(0x187)](_0xc3736)['then'](()=>{const _0x5401b6=_0x42c9c9;payRef[_0x5401b6(0x1ac)](CURRENT_UID)[_0x5401b6(0x1b8)]('value',_0x50c9ac=>{const _0x108c54=_0x5401b6;let _0x32be80=_0x50c9ac[_0x108c54(0x179)]()||0x0;payRef[_0x108c54(0x1ac)](CURRENT_UID)[_0x108c54(0x187)](_0x32be80+_0x57c419['price']);}),_0x571a7e['value']='',_0xef1c9[_0x5401b6(0x177)]='',_0x1a519a[_0x5401b6(0x177)]='',showToast(_0x5401b6(0x1e9)),document['getElementById'](_0x5401b6(0x18f))[_0x5401b6(0x1eb)][_0x5401b6(0x1d8)]=_0x5401b6(0x1e7);});});}function loadPayments(){const _0x5a2bb8=_0x1b356a;IS_SUPER?payRef['on'](_0x5a2bb8(0x177),_0x2b02ed=>{const _0x392881=_0x5a2bb8;let _0x5cb6fc=_0x2b02ed[_0x392881(0x179)]()||{},_0x1f5870=0x0;_0x2b02ed[_0x392881(0x18e)](_0x342229=>{const _0x22aced=_0x392881;_0x1f5870+=_0x342229[_0x22aced(0x179)]()||0x0;}),document[_0x392881(0x17f)](_0x392881(0x1a5))['innerText']=_0x392881(0x1b2)+_0x1f5870;if(document[_0x392881(0x17f)]('walletModal')[_0x392881(0x173)]['contains'](_0x392881(0x1df)))renderWalletManager(_0x5cb6fc);}):payRef[_0x5a2bb8(0x1ac)](CURRENT_UID)['on'](_0x5a2bb8(0x177),_0x47eb23=>{USER_BALANCE=_0x47eb23['val']()||0x0,document['getElementById']('amountBox')['innerText']='Due:\x20₹'+USER_BALANCE,checkLimitUI();});}function checkLimitUI(){const _0xc6554e=_0x1b356a;if(IS_SUPER)return;const _0xde79b9=MODES[CURRENT_MODE];USER_BALANCE>=_0xde79b9[_0xc6554e(0x1cb)]?(document['getElementById']('fabBtn')['classList'][_0xc6554e(0x1d7)](_0xc6554e(0x17b)),document[_0xc6554e(0x17f)](_0xc6554e(0x1b0))[_0xc6554e(0x1eb)][_0xc6554e(0x1d8)]=_0xc6554e(0x1e2)):(document[_0xc6554e(0x17f)](_0xc6554e(0x1b6))['classList'][_0xc6554e(0x1fe)](_0xc6554e(0x17b)),document[_0xc6554e(0x17f)](_0xc6554e(0x1b0))[_0xc6554e(0x1eb)][_0xc6554e(0x1d8)]='none');}function openWalletModal(){const _0x19d8b9=_0x1b356a;document[_0x19d8b9(0x17f)](_0x19d8b9(0x1f1))[_0x19d8b9(0x173)][_0x19d8b9(0x1d7)](_0x19d8b9(0x1df)),payRef['once']('value',_0x28c7c3=>renderWalletManager(_0x28c7c3[_0x19d8b9(0x179)]()||{}));}function closeWalletModal(){const _0x44325b=_0x1b356a;document['getElementById'](_0x44325b(0x1f1))[_0x44325b(0x173)]['remove'](_0x44325b(0x1df));}function renderWalletManager(_0x43e9a7){const _0x2c7064=_0x1b356a,_0x25613d=document[_0x2c7064(0x17f)](_0x2c7064(0x1b4));_0x25613d['innerHTML']='',Object[_0x2c7064(0x1e3)](_0x43e9a7)[_0x2c7064(0x18e)](_0x87a064=>{const _0x42809b=_0x2c7064;_0x25613d[_0x42809b(0x1c5)]+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:#222;\x20padding:10px;\x20border-radius:10px;\x20margin-bottom:5px;\x20display:flex;\x20justify-content:space-between;\x20align-items:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:10px;\x20color:#888;\x22>'+_0x87a064[_0x42809b(0x19a)](0x0,0x8)+_0x42809b(0x1e8)+_0x43e9a7[_0x87a064]+_0x42809b(0x1fc)+_0x87a064+_0x42809b(0x1ae)+_0x87a064+_0x42809b(0x1e4);});}function updateUserBalance(_0x2c30e0){const _0x16c7dc=_0x1b356a,_0x34831f=document['getElementById'](_0x16c7dc(0x1ef)+_0x2c30e0)[_0x16c7dc(0x177)];if(_0x34831f==='')return;payRef['child'](_0x2c30e0)[_0x16c7dc(0x187)](parseInt(_0x34831f))[_0x16c7dc(0x17d)](()=>showToast('Updated'));}function loadData(){db['on']('value',_0x3526c3=>{const _0x35f9f0=_0x3c69;DATA=_0x3526c3[_0x35f9f0(0x179)]()||{},render();});}function render(){const _0x530293=_0x1b356a,_0x3ff860=document['getElementById'](_0x530293(0x1b7)),_0x1b8bcd=document['getElementById'](_0x530293(0x17c))[_0x530293(0x177)][_0x530293(0x1ab)]();_0x3ff860[_0x530293(0x1c5)]='';const _0xe793b5=Object['keys'](DATA)[_0x530293(0x1fd)]((_0xf01f71,_0x8917ec)=>parseInt(_0x8917ec)-parseInt(_0xf01f71)),_0x4ba11a=new Date()[_0x530293(0x1f8)]()[_0x530293(0x1d6)]('T')[0x0];if(_0xe793b5[_0x530293(0x1a0)]===0x0){_0x3ff860[_0x530293(0x1c5)]=_0x530293(0x17a);return;}_0xe793b5[_0x530293(0x18e)](_0x12b277=>{const _0x19a494=_0x530293;let _0x28ecd6=DATA[_0x12b277];if(!IS_SUPER&&_0x28ecd6[_0x19a494(0x18b)]!==CURRENT_UID)return;if(_0x1b8bcd&&!(_0x28ecd6['nickname']+_0x28ecd6[_0x19a494(0x1aa)]+_0x28ecd6[_0x19a494(0x196)])['toLowerCase']()[_0x19a494(0x1c6)](_0x1b8bcd))return;let _0x5e2d8b=_0x5552b7=>{const _0x486953=_0x19a494,_0x6935a4=_0x5552b7[_0x486953(0x1d6)]('/');return new Date(_0x6935a4[0x2],_0x6935a4[0x1]-0x1,_0x6935a4[0x0])<new Date();},_0x9ef834=_0x5e2d8b(_0x28ecd6[_0x19a494(0x181)]),_0x2f9d4e=_0x28ecd6[_0x19a494(0x192)]===_0x4ba11a,_0xaa4811=_0x9ef834?'expired':_0x28ecd6[_0x19a494(0x1de)]?_0x19a494(0x195):_0x19a494(0x1bf),_0x301858=_0x9ef834?'#f59e0b':_0x28ecd6[_0x19a494(0x1de)]?_0x19a494(0x18d):_0x19a494(0x1f6);EDIT_ID===_0x12b277?_0x3ff860[_0x19a494(0x1c5)]+=_0x19a494(0x186)+_0x12b277+'\x22\x20value=\x22'+_0x28ecd6['nickname']+'\x22\x20'+(!IS_SUPER?_0x19a494(0x17b):'')+_0x19a494(0x1cd)+_0x12b277+_0x19a494(0x201)+_0x28ecd6[_0x19a494(0x1aa)]+_0x19a494(0x178)+_0x12b277+_0x19a494(0x201)+_0x28ecd6[_0x19a494(0x196)]+'\x22\x20'+(!IS_SUPER?_0x19a494(0x17b):'')+_0x19a494(0x1cc)+_0x12b277+'\x22\x20value=\x22'+_0x28ecd6['expiry_date']+'\x22\x20'+(!IS_SUPER?_0x19a494(0x17b):'')+'\x20style=\x22margin-bottom:10px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20gap:10px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-primary\x20btn-sm\x22\x20onclick=\x22saveEdit(\x27'+_0x12b277+_0x19a494(0x1ed):_0x3ff860[_0x19a494(0x1c5)]+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-row\x20'+_0xaa4811+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20font-size:14px;\x20color:#fff;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>'+(_0x28ecd6[_0x19a494(0x1bd)]||_0x19a494(0x17e))+_0x19a494(0x1c9)+_0x301858+_0x19a494(0x1f0)+(_0x9ef834?_0x19a494(0x1ec):_0x28ecd6[_0x19a494(0x1de)]?'Active':_0x19a494(0x1ee))+_0x19a494(0x1b1)+_0x28ecd6[_0x19a494(0x1aa)]+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-text\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+_0x28ecd6[_0x19a494(0x196)]+_0x19a494(0x199)+_0x28ecd6['key']+_0x19a494(0x1bc)+_0x28ecd6[_0x19a494(0x181)]+_0x19a494(0x1a4)+_0x12b277+_0x19a494(0x1a8)+(_0x28ecd6[_0x19a494(0x1de)]?_0x19a494(0x1ee):_0x19a494(0x202))+_0x19a494(0x198)+_0x12b277+_0x19a494(0x1f7)+_0x12b277+_0x19a494(0x200);});}function enableEdit(_0x446116){EDIT_ID=_0x446116,render();}function cancelEdit(){EDIT_ID=null,render();}function _0x3c69(_0xa430ca,_0x22e9d8){const _0x216b17=_0x216b();return _0x3c69=function(_0x3c692c,_0x4a94d4){_0x3c692c=_0x3c692c-0x173;let _0x3fb963=_0x216b17[_0x3c692c];return _0x3fb963;},_0x3c69(_0xa430ca,_0x22e9d8);}function saveEdit(_0x3966e1){const _0x728fec=_0x1b356a;let _0x275952=DATA[_0x3966e1];_0x275952[_0x728fec(0x1bd)]=document[_0x728fec(0x17f)](_0x728fec(0x193)+_0x3966e1)['value'],_0x275952['device_id']=document[_0x728fec(0x17f)](_0x728fec(0x1e0)+_0x3966e1)[_0x728fec(0x177)],_0x275952[_0x728fec(0x196)]=document[_0x728fec(0x17f)](_0x728fec(0x1c1)+_0x3966e1)[_0x728fec(0x177)],_0x275952[_0x728fec(0x181)]=document['getElementById'](_0x728fec(0x1f9)+_0x3966e1)['value'],db[_0x728fec(0x1ac)](_0x3966e1)['set'](_0x275952)[_0x728fec(0x17d)](()=>{const _0x2edc8f=_0x728fec;showToast(_0x2edc8f(0x175)),EDIT_ID=null;});}function toggleStatus(_0x49f047){const _0x43eb40=_0x1b356a;DATA[_0x49f047]['is_active']=!DATA[_0x49f047][_0x43eb40(0x1de)],db[_0x43eb40(0x1ac)](_0x49f047)[_0x43eb40(0x187)](DATA[_0x49f047]);}function openDeleteModal(_0x13f4ec){const _0xb6c1ff=_0x1b356a;TARGET_DELETE_ID=_0x13f4ec;const _0x14b52e=DATA[_0x13f4ec],_0x581b7f=new Date()[_0xb6c1ff(0x1f8)]()[_0xb6c1ff(0x1d6)]('T')[0x0],_0x1e25fb=MODES[CURRENT_MODE],_0x47bc34=document['getElementById'](_0xb6c1ff(0x1cf));_0x14b52e[_0xb6c1ff(0x192)]===_0x581b7f?_0x47bc34[_0xb6c1ff(0x1c5)]=_0xb6c1ff(0x1d3)+_0x1e25fb[_0xb6c1ff(0x1e1)]+_0xb6c1ff(0x1dd):_0x47bc34[_0xb6c1ff(0x1c5)]=_0xb6c1ff(0x19e),document[_0xb6c1ff(0x17f)](_0xb6c1ff(0x1ba))['classList']['add']('open');}function closeDeleteModal(){const _0x374655=_0x1b356a;document[_0x374655(0x17f)](_0x374655(0x1ba))[_0x374655(0x173)][_0x374655(0x1fe)](_0x374655(0x1df)),TARGET_DELETE_ID=null;}function confirmDelete(){const _0x5dda75=_0x1b356a;if(!TARGET_DELETE_ID)return;const _0x4c43ef=TARGET_DELETE_ID,_0x24bc4d=DATA[_0x4c43ef],_0x25a62f=new Date()['toISOString']()[_0x5dda75(0x1d6)]('T')[0x0],_0x1d3395=MODES[CURRENT_MODE];let _0x239050=_0x24bc4d[_0x5dda75(0x192)]===_0x25a62f;db[_0x5dda75(0x1ac)](_0x4c43ef)[_0x5dda75(0x1fe)]()[_0x5dda75(0x17d)](()=>{const _0x5c8911=_0x5dda75;_0x239050?payRef[_0x5c8911(0x1ac)](_0x24bc4d['owner_uid'])[_0x5c8911(0x1b8)]('value',_0x51b8c1=>{const _0x23450e=_0x5c8911;let _0x35134e=_0x51b8c1[_0x23450e(0x179)]()||0x0;payRef[_0x23450e(0x1ac)](_0x24bc4d[_0x23450e(0x18b)])[_0x23450e(0x187)](Math['max'](0x0,_0x35134e-_0x1d3395[_0x23450e(0x1e1)])),showToast('Deleted\x20&\x20Refunded');}):showToast(_0x5c8911(0x189)),closeDeleteModal();});}function copyKey(_0x266cb3){const _0x4ce652=_0x1b356a;navigator[_0x4ce652(0x1d2)][_0x4ce652(0x1d1)](_0x266cb3)[_0x4ce652(0x17d)](()=>showToast('Copied'));}
+
+
+</script>
+</body>
+</html>
