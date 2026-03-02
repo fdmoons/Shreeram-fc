@@ -1,376 +1,392 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Sky Admin · Upgrade</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Neon Sky Admin</title>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
-        /* ----- same elegant style, only upgrade-specific additions ----- */
-        :root {
-            --bg-main: #000000;
-            --bg-surface: rgba(255, 255, 255, 0.04);
-            --bg-surface-hover: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-light: rgba(255, 255, 255, 0.15);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            
-            --theme-fc: #0ea5e9; 
-            --theme-fc-glow: rgba(14, 165, 233, 0.25);
-            --theme-sm: #f59e0b; 
-            --theme-sm-glow: rgba(245, 158, 11, 0.25);
-            --theme-rn: #10b981; 
-            --theme-rn-glow: rgba(16, 185, 129, 0.25);
-            
-            --accent: var(--theme-fc);
-            --accent-glow: var(--theme-fc-glow);
-        }
-
-        body.theme-fc { --accent: var(--theme-fc); --accent-glow: var(--theme-fc-glow); }
-        body.theme-sm { --accent: var(--theme-sm); --accent-glow: var(--theme-sm-glow); }
-        body.theme-rn { --accent: var(--theme-rn); --accent-glow: var(--theme-rn-glow); }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .ambient-glow {
-            position: fixed; top: -20vh; left: 50%; transform: translateX(-50%);
-            width: 80vw; height: 60vh; background: var(--accent);
-            filter: blur(120px); opacity: 0.15; z-index: -1;
-            transition: background 0.8s ease; border-radius: 50%;
-        }
-
-        .container { max-width: 600px; margin: 0 auto; padding: 24px 20px 100px; position: relative; z-index: 1; }
-
-        /* --- GLASS CARDS --- */
-        .glass-card {
-            background: var(--bg-surface);
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 24px; margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
-        h3 { font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
-        p { color: var(--text-muted); font-size: 14px; }
-
-        /* --- INPUTS --- */
-        input {
-            width: 100%; padding: 14px 16px; background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color); border-radius: 12px;
-            color: #fff; font-family: inherit; font-size: 14px; margin-bottom: 12px; 
-            transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.6); box-shadow: 0 0 0 3px var(--accent-glow), inset 0 2px 4px rgba(0,0,0,0.2); }
-        input::placeholder { color: #52525b; }
-
-        /* --- BUTTONS --- */
-        .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 12px;
-            font-weight: 600; font-size: 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-family: inherit;
-        }
+<style>
+    :root {
+        --bg-main: #000000;
+        --bg-surface: rgba(255, 255, 255, 0.04);
+        --bg-surface-hover: rgba(255, 255, 255, 0.08);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --border-light: rgba(255, 255, 255, 0.15);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
         
-        .btn-primary { 
-            background: var(--accent); color: #000; 
-            box-shadow: 0 4px 15px var(--accent-glow), inset 0 -2px 0 rgba(0,0,0,0.1); 
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow), inset 0 -2px 0 rgba(0,0,0,0.1); }
-        .btn-primary:active { transform: translateY(0) scale(0.98); }
-
-        .btn-icon { width: 45px; padding: 0; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-icon:hover { background: var(--bg-surface-hover); border-color: var(--border-light); }
-
-        .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 10px; width: auto; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
-        .btn-outline:hover { background: var(--bg-surface-hover); border-color: var(--border-light); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-        .btn-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
-        .btn-success:hover { background: rgba(16, 185, 129, 0.2); }
-
-        /* upgrade specific – FC themed button */
-        .btn-upgrade {
-            background: var(--theme-fc);
-            color: #000;
-            box-shadow: 0 4px 15px var(--theme-fc-glow);
-        }
-        .btn-upgrade:hover { background: #0c8fd1; }
-
-        /* --- TABS, STATS, FILTERS (unchanged) --- */
-        .nav-tabs { display: flex; background: rgba(0,0,0,0.5); padding: 6px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        .nav-item { flex: 1; text-align: center; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
-        .nav-item.active { background: var(--bg-surface); color: #fff; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-
-        .header-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .balance-badge { font-size: 14px; font-weight: 700; color: var(--text-main); background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-
-        .mini-stats-bar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 16px 24px; border-radius: 18px; margin-bottom: 20px; }
-        .mini-stat { display: flex; flex-direction: column; gap: 4px; }
-        .mini-stat span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;}
-        .mini-stat strong { color: var(--text-main); font-size: 18px; font-weight: 600; }
-        .divider { width: 1px; height: 35px; background: var(--border-color); }
-
-        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .filter-bar::-webkit-scrollbar { display: none; }
-        .filter-btn { background: rgba(0,0,0,0.3); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.2s; font-weight: 500; }
-        .filter-btn:hover { color: #fff; background: var(--bg-surface); }
-        .filter-btn.active { background: var(--accent-glow); color: #fff; border-color: var(--accent); }
-
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-        .key-row {
-            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid var(--border-color); border-radius: 18px; padding: 20px; margin-bottom: 14px;
-            transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
-            animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .key-row:hover { border-color: var(--border-light); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
-
-        .status-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
-        .status-active { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .status-active::before { background: #34d399; }
-        .status-expired { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
-        .status-expired::before { background: #fbbf24; }
-        .status-banned { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .status-banned::before { background: #f87171; }
-
-        .key-text { font-family: monospace; font-size: 15px; color: var(--accent); background: rgba(0,0,0,0.5); padding: 14px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin: 16px 0; border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
-        .key-text i { color: var(--text-muted); transition: 0.2s; cursor: pointer; padding: 5px; }
-        .key-text i:hover { color: #fff; transform: scale(1.2); }
-
-        .date-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); }
-        .date-col { display: flex; flex-direction: column; gap: 4px; }
-        .date-col span { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;}
-        .date-col strong { font-size: 13px; color: var(--text-main); font-weight: 500; }
-
-        .empty-state { text-align: center; padding: 50px 20px; animation: slideUpFade 0.4s ease forwards; }
-        .empty-state i { font-size: 40px; color: var(--border-light); margin-bottom: 15px; display: block; }
-        .empty-state h4 { color: var(--text-main); margin-bottom: 5px; font-weight: 500;}
-        .empty-state p { color: var(--text-muted); font-size: 13px;}
-
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--text-main); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 10px 30px rgba(255,255,255,0.2); cursor: pointer; z-index: 100; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .fab:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 40px rgba(255,255,255,0.3); }
-        .fab:active { transform: translateY(0) scale(0.95); }
-        .fab.disabled { background: #27272a; color: #52525b; box-shadow: none; pointer-events: none; }
-
-        @keyframes modalScaleIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        /* Premium Gradients & Colors */
+        --theme-fc: #0ea5e9; 
+        --theme-fc-glow: rgba(14, 165, 233, 0.25);
         
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
-        .modal-card { background: var(--bg-main); border: 1px solid var(--border-light); width: 90%; max-width: 380px; padding: 30px; border-radius: 24px; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.8); animation: modalScaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
-        .modal-card::before { content:''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; height: 50px; background: var(--accent); opacity: 0.1; filter: blur(30px); }
+        --theme-sm: #f59e0b; 
+        --theme-sm-glow: rgba(245, 158, 11, 0.25);
+        
+        --theme-rn: #10b981; 
+        --theme-rn-glow: rgba(16, 185, 129, 0.25);
+        
+        --accent: var(--theme-fc);
+        --accent-glow: var(--theme-fc-glow);
+    }
 
-        #loader { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; backdrop-filter: blur(5px); }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.05); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-        
-        #toast { visibility: hidden; background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #fff; text-align: center; font-weight: 500; border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 12px 24px; position: fixed; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px) scale(0.9); font-size: 14px; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-    </style>
+    body.theme-fc { --accent: var(--theme-fc); --accent-glow: var(--theme-fc-glow); }
+    body.theme-sm { --accent: var(--theme-sm); --accent-glow: var(--theme-sm-glow); }
+    body.theme-rn { --accent: var(--theme-rn); --accent-glow: var(--theme-rn-glow); }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+        position: fixed; top: -20vh; left: 50%; transform: translateX(-50%);
+        width: 80vw; height: 60vh; background: var(--accent);
+        filter: blur(120px); opacity: 0.15; z-index: -1;
+        transition: background 0.8s ease; border-radius: 50%;
+    }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 24px 20px 100px; position: relative; z-index: 1; }
+
+    /* --- GLASS CARDS --- */
+    .glass-card {
+        background: var(--bg-surface);
+        backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px; padding: 24px; margin-bottom: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+    h3 { font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+    p { color: var(--text-muted); font-size: 14px; }
+
+    /* --- INPUTS --- */
+    input {
+        width: 100%; padding: 14px 16px; background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--border-color); border-radius: 12px;
+        color: #fff; font-family: inherit; font-size: 14px; margin-bottom: 12px; 
+        transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input:focus { border-color: var(--accent); background: rgba(0,0,0,0.6); box-shadow: 0 0 0 3px var(--accent-glow), inset 0 2px 4px rgba(0,0,0,0.2); }
+    input::placeholder { color: #52525b; }
+
+    /* --- BUTTONS --- */
+    .btn {
+        width: 100%; padding: 14px; border: none; border-radius: 12px;
+        font-weight: 600; font-size: 14px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-family: inherit;
+    }
+    
+    .btn-primary { 
+        background: var(--accent); color: #000; 
+        box-shadow: 0 4px 15px var(--accent-glow), inset 0 -2px 0 rgba(0,0,0,0.1); 
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow), inset 0 -2px 0 rgba(0,0,0,0.1); }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+    .btn-icon { width: 45px; padding: 0; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-icon:hover { background: var(--bg-surface-hover); border-color: var(--border-light); }
+
+    .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 10px; width: auto; }
+    .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg-surface-hover); border-color: var(--border-light); }
+    .btn-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+    .btn-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
+    .btn-success:hover { background: rgba(16, 185, 129, 0.2); }
+
+    /* --- TABS --- */
+    .nav-tabs {
+        display: flex; background: rgba(0,0,0,0.5); padding: 6px;
+        border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 24px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .nav-item {
+        flex: 1; text-align: center; padding: 10px; border-radius: 12px;
+        font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s;
+    }
+    .nav-item.active { background: var(--bg-surface); color: #fff; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+    /* --- STATS --- */
+    .header-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .balance-badge {
+        font-size: 14px; font-weight: 700; color: var(--text-main);
+        background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+        padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); 
+        display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .mini-stats-bar {
+        display: flex; justify-content: space-between; align-items: center;
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        padding: 16px 24px; border-radius: 18px; margin-bottom: 20px;
+    }
+    .mini-stat { display: flex; flex-direction: column; gap: 4px; }
+    .mini-stat span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;}
+    .mini-stat strong { color: var(--text-main); font-size: 18px; font-weight: 600; }
+    .divider { width: 1px; height: 35px; background: var(--border-color); }
+
+    /* --- FILTERS --- */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-btn {
+        background: rgba(0,0,0,0.3); color: var(--text-muted); border: 1px solid var(--border-color);
+        padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.2s; font-weight: 500;
+    }
+    .filter-btn:hover { color: #fff; background: var(--bg-surface); }
+    .filter-btn.active { background: var(--accent-glow); color: #fff; border-color: var(--accent); }
+
+    /* --- LIST CARDS & ANIMATIONS --- */
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .key-row {
+        background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+        border: 1px solid var(--border-color); border-radius: 18px; padding: 20px; margin-bottom: 14px;
+        transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
+        animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .key-row:hover { border-color: var(--border-light); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+
+    .status-badge {
+        font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+    .status-active { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-active::before { background: #34d399; }
+    .status-expired { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .status-expired::before { background: #fbbf24; }
+    .status-banned { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .status-banned::before { background: #f87171; }
+
+    .key-text {
+        font-family: monospace; font-size: 15px; color: var(--accent);
+        background: rgba(0,0,0,0.5); padding: 14px 16px; border-radius: 12px;
+        display: flex; justify-content: space-between; align-items: center; margin: 16px 0;
+        border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .key-text i { color: var(--text-muted); transition: 0.2s; cursor: pointer; padding: 5px; }
+    .key-text i:hover { color: #fff; transform: scale(1.2); }
+
+    .date-info {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);
+    }
+    .date-col { display: flex; flex-direction: column; gap: 4px; }
+    .date-col span { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;}
+    .date-col strong { font-size: 13px; color: var(--text-main); font-weight: 500; }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 50px 20px; animation: slideUpFade 0.4s ease forwards; }
+    .empty-state i { font-size: 40px; color: var(--border-light); margin-bottom: 15px; display: block; }
+    .empty-state h4 { color: var(--text-main); margin-bottom: 5px; font-weight: 500;}
+    .empty-state p { color: var(--text-muted); font-size: 13px;}
+
+    /* --- FAB & MODALS --- */
+    .fab {
+        position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+        background: var(--text-main); color: #000; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center; font-size: 22px;
+        box-shadow: 0 10px 30px rgba(255,255,255,0.2); cursor: pointer; z-index: 100; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .fab:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 40px rgba(255,255,255,0.3); }
+    .fab:active { transform: translateY(0) scale(0.95); }
+    .fab.disabled { background: #27272a; color: #52525b; box-shadow: none; pointer-events: none; }
+
+    @keyframes modalScaleIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    
+    .modal-overlay {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+        align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-card {
+        background: var(--bg-main); border: 1px solid var(--border-light); width: 90%; max-width: 380px;
+        padding: 30px; border-radius: 24px; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.8);
+        animation: modalScaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
+    }
+    /* Modal ambient glow */
+    .modal-card::before {
+        content:''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+        width: 100%; height: 50px; background: var(--accent); opacity: 0.1; filter: blur(30px);
+    }
+
+    /* Modern Loader */
+    #loader { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; backdrop-filter: blur(5px); }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.05); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+    
+    /* Mac-OS Style Toast */
+    #toast {
+        visibility: hidden; background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        color: #fff; text-align: center; font-weight: 500; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 30px; padding: 12px 24px; position: fixed; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px) scale(0.9); font-size: 14px; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+</style>
 </head>
 <body class="theme-fc">
 
-<div class="ambient-glow"></div>
-<div id="loader"><div class="spinner"></div><span style="font-size:12px; color:var(--text-muted); font-weight:500; letter-spacing:1px; text-transform:uppercase;">Loading</span></div>
-<div id="toast">Saved Successfully</div>
+    <div class="ambient-glow"></div>
+    <div id="loader"><div class="spinner"></div><span style="font-size:12px; color:var(--text-muted); font-weight:500; letter-spacing:1px; text-transform:uppercase;">Loading</span></div>
+    <div id="toast">Saved Successfully</div>
 
-<!-- Delete Modal -->
-<div id="deleteModal" class="modal-overlay"> <!-- content unchanged, omitted for brevity but remains in final code --> 
-    <div class="modal-card">
-        <div style="width: 50px; height: 50px; background: rgba(239, 68, 68, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid rgba(239, 68, 68, 0.2);">
-            <i class="fa-solid fa-trash" style="color: #ef4444; font-size: 20px;"></i>
-        </div>
-        <h3 style="justify-content:center; margin-bottom: 8px;">Delete License?</h3>
-        <p style="text-align:center; margin-bottom:20px;">This action is permanent and cannot be undone.</p>
-        <div id="refundBadge" style="text-align:center; margin-bottom:24px;"></div>
-        <div style="display:flex; gap:12px;">
-            <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
-            <button class="btn btn-primary" style="background:#ef4444; color:#fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);" onclick="confirmDelete()">Delete Permanently</button>
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="width: 50px; height: 50px; background: rgba(239, 68, 68, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                <i class="fa-solid fa-trash" style="color: #ef4444; font-size: 20px;"></i>
+            </div>
+            <h3 style="justify-content:center; margin-bottom: 8px;">Delete License?</h3>
+            <p style="text-align:center; margin-bottom:20px;">This action is permanent and cannot be undone.</p>
+            <div id="refundBadge" style="text-align:center; margin-bottom:24px;"></div>
+            <div style="display:flex; gap:12px;">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-primary" style="background:#ef4444; color:#fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);" onclick="confirmDelete()">Delete Permanently</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Renew Modal -->
-<div id="renewModal" class="modal-overlay"> <!-- content unchanged --> 
-    <div class="modal-card">
-        <div style="width: 50px; height: 50px; background: var(--accent-glow); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--accent);">
-            <i class="fa-solid fa-bolt" style="color: var(--accent); font-size: 20px;"></i>
+    <div id="renewModal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="width: 50px; height: 50px; background: var(--accent-glow); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--accent);">
+                <i class="fa-solid fa-bolt" style="color: var(--accent); font-size: 20px;"></i>
+            </div>
+            <h3 style="justify-content:center; margin-bottom: 8px;">Renew License</h3>
+            <p style="text-align:center; margin-bottom:20px;">Extend this license validity for another 30 days.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color:var(--text-muted); font-size: 14px;">Renewal Charge</span>
+                <strong style="color:var(--text-main); font-size: 18px;" id="renewCostDisplay">₹0</strong>
+            </div>
+
+            <div style="display:flex; gap:12px;">
+                <button class="btn btn-outline" onclick="closeRenewModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmRenew()">Confirm Renewal</button>
+            </div>
         </div>
-        <h3 style="justify-content:center; margin-bottom: 8px;">Renew License</h3>
-        <p style="text-align:center; margin-bottom:20px;">Extend this license validity for another 30 days.</p>
+    </div>
+
+    <div id="walletModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 450px;">
+            <h3 style="margin-bottom:20px;"><i class="fa-solid fa-users"></i> Manage Resellers</h3>
+            <div id="walletList" style="max-height: 350px; overflow-y: auto; margin-bottom:20px; display:flex; flex-direction:column; gap:10px; padding-right: 5px;"></div>
+            <button class="btn btn-outline" onclick="closeWalletModal()">Close Panel</button>
+        </div>
+    </div>
+
+    <div class="container">
         
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="color:var(--text-muted); font-size: 14px;">Renewal Charge</span>
-            <strong style="color:var(--text-main); font-size: 18px;" id="renewCostDisplay">₹0</strong>
+        <div id="loginBox" class="glass-card" style="margin-top: 20vh; text-align: center; padding: 40px 24px;">
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--bg-surface), rgba(0,0,0,0.5)); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; border: 1px solid var(--border-color); box-shadow: 0 8px 20px rgba(0,0,0,0.5);">
+                <i class="fa-solid fa-shield-halved" style="color: var(--accent); font-size: 24px;"></i>
+            </div>
+            <h2 style="margin-bottom:8px;">Admin Portal</h2>
+            <p style="margin-bottom:30px;">Authenticate to access workspace</p>
+            <input id="email" type="email" placeholder="Email address">
+            <input id="pass" type="password" placeholder="Password">
+            <button class="btn btn-primary" style="margin-top: 10px;" onclick="login()">Authenticate <i class="fa-solid fa-arrow-right" style="font-size: 12px;"></i></button>
         </div>
 
-        <div style="display:flex; gap:12px;">
-            <button class="btn btn-outline" onclick="closeRenewModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="confirmRenew()">Confirm Renewal</button>
+        <div id="panel" style="display:none">
+            
+            <div class="header-group">
+                <div>
+                    <p style="font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Workspace</p>
+                    <h2 id="roleTitle">Panel</h2>
+                </div>
+                <div id="amountBox" class="balance-badge"><i class="fa-solid fa-wallet" style="color:var(--text-muted); font-size:12px;"></i> ₹0</div>
+            </div>
+
+            <div class="nav-tabs">
+                <div id="tab_FC" class="nav-item active" onclick="switchMode('FC')">FC</div>
+                <div id="tab_SIMPLE" class="nav-item" onclick="switchMode('SIMPLE')">SIMPLE</div>
+                <div id="tab_RN" class="nav-item" onclick="switchMode('RN')">RN</div>
+            </div>
+
+            <div class="mini-stats-bar">
+                <div class="mini-stat">
+                    <span>License Price</span>
+                    <strong id="priceDisplay">₹2500</strong>
+                </div>
+                <div class="divider"></div>
+                <div class="mini-stat" style="align-items: flex-end;">
+                    <span>Credit Limit</span>
+                    <strong id="limitDisplay">₹10000</strong>
+                </div>
+            </div>
+
+            <div id="limitMsg" class="glass-card" style="border-color:#ef4444; background:rgba(239,68,68,0.05); display:none; padding:16px; text-align:center;">
+                <p style="color:#f87171; font-weight:500;"><i class="fa-solid fa-triangle-exclamation"></i> Credit Limit Reached. Please clear dues to generate more keys.</p>
+            </div>
+
+            <div style="position: relative; margin-bottom: 24px; display: flex; gap: 12px;">
+                <div style="position: relative; flex: 1;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px;"></i>
+                    <input id="searchBox" placeholder="Search device ID, name or key..." oninput="render()" style="margin:0; padding-left: 45px; background: var(--bg-surface); border-radius: 16px;">
+                </div>
+                <button class="btn btn-outline" style="width: auto; padding: 0 18px; border-radius: 16px;" onclick="logout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+
+            <div id="adminControls" style="display:none; margin-bottom: 24px;">
+                <button class="btn btn-outline btn-sm" style="padding: 10px 16px; border-radius: 14px;" onclick="openWalletModal()"><i class="fa-solid fa-users"></i> Manage Resellers Dashboard</button>
+            </div>
+
+            <div class="filter-bar">
+                <button id="filter_ALL" class="filter-btn active" onclick="setFilter('ALL')">All <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_ALL">0</span></button>
+                <button id="filter_ACTIVE" class="filter-btn" onclick="setFilter('ACTIVE')">Active <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_ACTIVE">0</span></button>
+                <button id="filter_EXPIRED" class="filter-btn" onclick="setFilter('EXPIRED')">Expired <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_EXPIRED">0</span></button>
+                <button id="filter_BANNED" class="filter-btn" onclick="setFilter('BANNED')">Banned <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_BANNED">0</span></button>
+            </div>
+
+            <div id="addForm" class="glass-card" style="display:none; border-color:var(--accent);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h3 style="margin:0;"><i class="fa-solid fa-key" style="color:var(--accent)"></i> Create New License</h3>
+                    <i class="fa-solid fa-xmark" style="color:var(--text-muted); cursor:pointer; font-size:18px;" onclick="toggleAddForm()"></i>
+                </div>
+                <input id="device" placeholder="Enter Device ID">
+                <input id="nickname" placeholder="User Nickname (Optional)">
+                <div style="display: flex; gap: 10px; margin-bottom:20px;">
+                    <input id="keyval" placeholder="License Key" style="margin:0; font-family:monospace; color:var(--accent);">
+                    <button class="btn btn-icon" style="border-radius:12px;" onclick="keyval.value=generateKey()"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+                <button class="btn btn-primary" onclick="addKey()">Generate & Save Key</button>
+            </div>
+
+            <div id="list"></div>
+
+            <div id="fabBtn" class="fab" onclick="toggleAddForm()">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
         </div>
     </div>
-</div>
-
-<!-- NEW UPGRADE MODAL (FC) -->
-<div id="upgradeModal" class="modal-overlay">
-    <div class="modal-card">
-        <div style="width: 50px; height: 50px; background: var(--theme-fc-glow); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--theme-fc);">
-            <i class="fa-solid fa-arrow-up" style="color: var(--theme-fc); font-size: 20px;"></i>
-        </div>
-        <h3 style="justify-content:center; margin-bottom: 8px;">Upgrade to FC</h3>
-        <p style="text-align:center; margin-bottom:20px;">Upgrade this license to FC for the remaining validity period.</p>
-        
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                <span style="color:var(--text-muted);">Remaining Days</span>
-                <strong id="upgradeRemainingDays">0</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                <span style="color:var(--text-muted);">Upgrade Cost</span>
-                <strong style="color:var(--theme-fc); font-size:18px;" id="upgradeCostDisplay">₹0</strong>
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:8px; border-top:1px dashed var(--border-color); padding-top:8px;">
-                <i class="fa-solid fa-circle-info"></i> You will be charged only the difference for remaining days.
-            </div>
-        </div>
-
-        <div style="display:flex; gap:12px;">
-            <button class="btn btn-outline" onclick="closeUpgradeModal()">Cancel</button>
-            <button class="btn btn-primary" style="background:var(--theme-fc); box-shadow:0 4px 15px var(--theme-fc-glow);" onclick="confirmUpgrade()">Confirm Upgrade</button>
-        </div>
-    </div>
-</div>
-
-<!-- Wallet Modal -->
-<div id="walletModal" class="modal-overlay"> <!-- content unchanged --> 
-    <div class="modal-card" style="max-width: 450px;">
-        <h3 style="margin-bottom:20px;"><i class="fa-solid fa-users"></i> Manage Resellers</h3>
-        <div id="walletList" style="max-height: 350px; overflow-y: auto; margin-bottom:20px; display:flex; flex-direction:column; gap:10px; padding-right: 5px;"></div>
-        <button class="btn btn-outline" onclick="closeWalletModal()">Close Panel</button>
-    </div>
-</div>
-
-<!-- Main Container -->
-<div class="container">
-    
-    <div id="loginBox" class="glass-card" style="margin-top: 20vh; text-align: center; padding: 40px 24px;"> <!-- unchanged --> 
-        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--bg-surface), rgba(0,0,0,0.5)); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; border: 1px solid var(--border-color); box-shadow: 0 8px 20px rgba(0,0,0,0.5);">
-            <i class="fa-solid fa-shield-halved" style="color: var(--accent); font-size: 24px;"></i>
-        </div>
-        <h2 style="margin-bottom:8px;">Admin Portal</h2>
-        <p style="margin-bottom:30px;">Authenticate to access workspace</p>
-        <input id="email" type="email" placeholder="Email address">
-        <input id="pass" type="password" placeholder="Password">
-        <button class="btn btn-primary" style="margin-top: 10px;" onclick="login()">Authenticate <i class="fa-solid fa-arrow-right" style="font-size: 12px;"></i></button>
-    </div>
-
-    <div id="panel" style="display:none">
-        
-        <div class="header-group"> <!-- unchanged --> 
-            <div>
-                <p style="font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Workspace</p>
-                <h2 id="roleTitle">Panel</h2>
-            </div>
-            <div id="amountBox" class="balance-badge"><i class="fa-solid fa-wallet" style="color:var(--text-muted); font-size:12px;"></i> ₹0</div>
-        </div>
-
-        <div class="nav-tabs"> <!-- unchanged --> 
-            <div id="tab_FC" class="nav-item active" onclick="switchMode('FC')">FC</div>
-            <div id="tab_SIMPLE" class="nav-item" onclick="switchMode('SIMPLE')">SIMPLE</div>
-            <div id="tab_RN" class="nav-item" onclick="switchMode('RN')">RN</div>
-        </div>
-
-        <div class="mini-stats-bar"> <!-- unchanged --> 
-            <div class="mini-stat">
-                <span>License Price</span>
-                <strong id="priceDisplay">₹2500</strong>
-            </div>
-            <div class="divider"></div>
-            <div class="mini-stat" style="align-items: flex-end;">
-                <span>Credit Limit</span>
-                <strong id="limitDisplay">₹10000</strong>
-            </div>
-        </div>
-
-        <div id="limitMsg" class="glass-card" style="border-color:#ef4444; background:rgba(239,68,68,0.05); display:none; padding:16px; text-align:center;">
-            <p style="color:#f87171; font-weight:500;"><i class="fa-solid fa-triangle-exclamation"></i> Credit Limit Reached. Please clear dues to generate more keys.</p>
-        </div>
-
-        <div style="position: relative; margin-bottom: 24px; display: flex; gap: 12px;"> <!-- unchanged --> 
-            <div style="position: relative; flex: 1;">
-                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px;"></i>
-                <input id="searchBox" placeholder="Search device ID, name or key..." oninput="render()" style="margin:0; padding-left: 45px; background: var(--bg-surface); border-radius: 16px;">
-            </div>
-            <button class="btn btn-outline" style="width: auto; padding: 0 18px; border-radius: 16px;" onclick="logout()" title="Logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-        </div>
-
-        <div id="adminControls" style="display:none; margin-bottom: 24px;"> <!-- unchanged --> 
-            <button class="btn btn-outline btn-sm" style="padding: 10px 16px; border-radius: 14px;" onclick="openWalletModal()"><i class="fa-solid fa-users"></i> Manage Resellers Dashboard</button>
-        </div>
-
-        <div class="filter-bar"> <!-- unchanged --> 
-            <button id="filter_ALL" class="filter-btn active" onclick="setFilter('ALL')">All <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_ALL">0</span></button>
-            <button id="filter_ACTIVE" class="filter-btn" onclick="setFilter('ACTIVE')">Active <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_ACTIVE">0</span></button>
-            <button id="filter_EXPIRED" class="filter-btn" onclick="setFilter('EXPIRED')">Expired <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_EXPIRED">0</span></button>
-            <button id="filter_BANNED" class="filter-btn" onclick="setFilter('BANNED')">Banned <span style="opacity:0.6; font-size:11px; margin-left:6px;" id="count_BANNED">0</span></button>
-        </div>
-
-        <div id="addForm" class="glass-card" style="display:none; border-color:var(--accent);"> <!-- unchanged --> 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                <h3 style="margin:0;"><i class="fa-solid fa-key" style="color:var(--accent)"></i> Create New License</h3>
-                <i class="fa-solid fa-xmark" style="color:var(--text-muted); cursor:pointer; font-size:18px;" onclick="toggleAddForm()"></i>
-            </div>
-            <input id="device" placeholder="Enter Device ID">
-            <input id="nickname" placeholder="User Nickname (Optional)">
-            <div style="display: flex; gap: 10px; margin-bottom:20px;">
-                <input id="keyval" placeholder="License Key" style="margin:0; font-family:monospace; color:var(--accent);">
-                <button class="btn btn-icon" style="border-radius:12px;" onclick="keyval.value=generateKey()"><i class="fa-solid fa-rotate"></i></button>
-            </div>
-            <button class="btn btn-primary" onclick="addKey()">Generate & Save Key</button>
-        </div>
-
-        <div id="list"></div>
-
-        <div id="fabBtn" class="fab" onclick="toggleAddForm()">
-            <i class="fa-solid fa-plus"></i>
-        </div>
-
-    </div>
-</div>
 
 <script>
-   
-   const _0x4f4a48=_0x145a;(function(_0x541534,_0x5de9e2){const _0x1ac95d=_0x145a,_0x5e1254=_0x541534();while(!![]){try{const _0x4ac6ac=parseInt(_0x1ac95d(0x1fd))/0x1*(-parseInt(_0x1ac95d(0x1cb))/0x2)+parseInt(_0x1ac95d(0x1ef))/0x3+-parseInt(_0x1ac95d(0x21e))/0x4*(parseInt(_0x1ac95d(0x16b))/0x5)+-parseInt(_0x1ac95d(0x1eb))/0x6*(parseInt(_0x1ac95d(0x206))/0x7)+parseInt(_0x1ac95d(0x1d3))/0x8+parseInt(_0x1ac95d(0x1db))/0x9*(-parseInt(_0x1ac95d(0x168))/0xa)+parseInt(_0x1ac95d(0x19f))/0xb;if(_0x4ac6ac===_0x5de9e2)break;else _0x5e1254['push'](_0x5e1254['shift']());}catch(_0x6900db){_0x5e1254['push'](_0x5e1254['shift']());}}}(_0x5608,0xac2ff));const MODES={'FC':{'db':_0x4f4a48(0x205),'payRefPath':'payments','price':0x9c4,'limit':0x2710,'name':'FC','theme':_0x4f4a48(0x1e9)},'SIMPLE':{'db':_0x4f4a48(0x16c),'payRefPath':'payments_SIMPLE','price':0x4b0,'limit':0x1770,'name':_0x4f4a48(0x1c0),'theme':_0x4f4a48(0x1d4)},'RN':{'db':_0x4f4a48(0x1bc),'payRefPath':_0x4f4a48(0x174),'price':0x708,'limit':0x1770,'name':'RN','theme':'theme-rn'}};let CURRENT_MODE='FC',CURRENT_FILTER=_0x4f4a48(0x1e3);window[_0x4f4a48(0x1a2)]=()=>{const _0x508004=_0x4f4a48;setTimeout(()=>document[_0x508004(0x1ad)](_0x508004(0x1ca))[_0x508004(0x181)]['display']='none',0x320);};function showToast(_0x3ed54d){const _0x5413f5=_0x4f4a48,_0x54acd0=document[_0x5413f5(0x1ad)]('toast');_0x54acd0[_0x5413f5(0x1a1)]=_0x5413f5(0x20f)+_0x3ed54d,_0x54acd0[_0x5413f5(0x170)]['add'](_0x5413f5(0x1c5)),setTimeout(()=>_0x54acd0[_0x5413f5(0x170)][_0x5413f5(0x18c)](_0x5413f5(0x1c5)),0xdac);}const firebaseConfig={'apiKey':_0x4f4a48(0x1ae),'authDomain':_0x4f4a48(0x1ab),'databaseURL':'https://shreeram-605be-default-rtdb.asia-southeast1.firebasedatabase.app','projectId':_0x4f4a48(0x19d)};firebase[_0x4f4a48(0x1e2)](firebaseConfig);const SUPER_ADMIN_UID=_0x4f4a48(0x225);let CURRENT_UID=null,IS_SUPER=![],db=null,payRef=null,DATA={},USER_BALANCE=0x0,EDIT_ID=null,TARGET_DELETE_ID=null,TARGET_RENEW_ID=null,TARGET_UPGRADE_ID=null,TARGET_UPGRADE_MODE=null,UPGRADE_COST=0x0;function switchMode(_0xd37b9b){const _0x33940b=_0x4f4a48;CURRENT_MODE=_0xd37b9b;const _0x4fa719=MODES[_0xd37b9b];document[_0x33940b(0x21a)][_0x33940b(0x18a)]=_0x4fa719[_0x33940b(0x1c3)],document[_0x33940b(0x17b)]('.nav-item')[_0x33940b(0x21b)](_0x5558e2=>_0x5558e2[_0x33940b(0x170)][_0x33940b(0x18c)]('active')),document[_0x33940b(0x1ad)]('tab_'+_0xd37b9b)[_0x33940b(0x170)][_0x33940b(0x1b5)](_0x33940b(0x1c4)),document['getElementById'](_0x33940b(0x204))[_0x33940b(0x1fa)]='₹'+_0x4fa719[_0x33940b(0x212)],document[_0x33940b(0x1ad)](_0x33940b(0x1f6))['innerText']='₹'+_0x4fa719[_0x33940b(0x197)];if(db)db[_0x33940b(0x1d0)]();if(payRef)payRef[_0x33940b(0x1d0)]();if(payRef&&!IS_SUPER)payRef[_0x33940b(0x1f5)](CURRENT_UID)[_0x33940b(0x1d0)]();db=firebase[_0x33940b(0x205)]()[_0x33940b(0x1b2)](_0x4fa719['db']),payRef=firebase[_0x33940b(0x205)]()[_0x33940b(0x1b2)](_0x4fa719[_0x33940b(0x1dd)]),loadData(),loadPayments();}firebase[_0x4f4a48(0x1da)]()[_0x4f4a48(0x201)](_0x264994=>{const _0x27f6ce=_0x4f4a48;_0x264994&&(CURRENT_UID=_0x264994[_0x27f6ce(0x1dc)],document[_0x27f6ce(0x1ad)](_0x27f6ce(0x1b6))[_0x27f6ce(0x181)]['display']=_0x27f6ce(0x186),document[_0x27f6ce(0x1ad)](_0x27f6ce(0x1ff))[_0x27f6ce(0x181)][_0x27f6ce(0x1bb)]=_0x27f6ce(0x209),_0x264994[_0x27f6ce(0x1dc)]===SUPER_ADMIN_UID?(IS_SUPER=!![],document[_0x27f6ce(0x1ad)](_0x27f6ce(0x1a8))['innerText']='Super\x20Admin',document['getElementById'](_0x27f6ce(0x166))['style'][_0x27f6ce(0x1bb)]=_0x27f6ce(0x209)):(document[_0x27f6ce(0x1ad)](_0x27f6ce(0x1a8))[_0x27f6ce(0x1fa)]=_0x27f6ce(0x1a7),document[_0x27f6ce(0x1ad)]('adminControls')[_0x27f6ce(0x181)][_0x27f6ce(0x1bb)]=_0x27f6ce(0x186)),switchMode('FC'));});function login(){const _0x49b974=_0x4f4a48,_0x11e7cb=document[_0x49b974(0x1ad)]('email')[_0x49b974(0x207)],_0x4bf046=document[_0x49b974(0x1ad)](_0x49b974(0x20d))[_0x49b974(0x207)];document['getElementById']('loader')['style']['display']=_0x49b974(0x172),firebase[_0x49b974(0x1da)]()[_0x49b974(0x175)](_0x11e7cb,_0x4bf046)[_0x49b974(0x183)](()=>{const _0x9c425d=_0x49b974;document[_0x9c425d(0x1ad)](_0x9c425d(0x1ca))[_0x9c425d(0x181)][_0x9c425d(0x1bb)]=_0x9c425d(0x186);})[_0x49b974(0x19b)](_0x17c324=>{const _0x13b7ac=_0x49b974;document['getElementById']('loader')['style'][_0x13b7ac(0x1bb)]='none',showToast(_0x17c324[_0x13b7ac(0x1f3)][_0x13b7ac(0x1f4)](_0x13b7ac(0x192),''));});}function logout(){const _0x5a6c1e=_0x4f4a48;firebase[_0x5a6c1e(0x1da)]()[_0x5a6c1e(0x1e1)](),location[_0x5a6c1e(0x177)]();}function generateKey(){const _0xbed901=_0x4f4a48;return _0xbed901(0x1d2)+Math[_0xbed901(0x169)]()['toString'](0x24)[_0xbed901(0x178)](0x2,0xa)[_0xbed901(0x1e8)]();}function toggleAddForm(){const _0x68b901=_0x4f4a48,_0x5e7810=MODES[CURRENT_MODE];if(USER_BALANCE>=_0x5e7810[_0x68b901(0x197)]&&!IS_SUPER){showToast(_0x68b901(0x16d));return;}const _0x5cc005=document[_0x68b901(0x1ad)](_0x68b901(0x195)),_0x1566bd=_0x5cc005[_0x68b901(0x181)][_0x68b901(0x1bb)]===_0x68b901(0x186);_0x5cc005[_0x68b901(0x181)]['display']=_0x1566bd?_0x68b901(0x209):_0x68b901(0x186),_0x1566bd&&(_0x5cc005[_0x68b901(0x181)][_0x68b901(0x17f)]='slideUpFade\x200.3s\x20ease\x20forwards',document['getElementById'](_0x68b901(0x1c6))[_0x68b901(0x1d7)]());}function addKey(){const _0x2f4ab7=_0x4f4a48,_0x5c3655=MODES[CURRENT_MODE];if(!IS_SUPER&&USER_BALANCE>=_0x5c3655['limit']){showToast(_0x2f4ab7(0x1de));return;}const _0x23a707=document[_0x2f4ab7(0x1ad)]('device'),_0x1a443f=document[_0x2f4ab7(0x1ad)](_0x2f4ab7(0x163)),_0x350211=document[_0x2f4ab7(0x1ad)](_0x2f4ab7(0x1c1));if(!_0x23a707['value']||!_0x350211[_0x2f4ab7(0x207)]){showToast(_0x2f4ab7(0x198));return;}let _0x4967b8=new Date();_0x4967b8['setDate'](_0x4967b8[_0x2f4ab7(0x1ea)]()+0x1e);const _0x1e5a10={'device_id':_0x23a707[_0x2f4ab7(0x207)],'nickname':_0x1a443f[_0x2f4ab7(0x207)],'key':_0x350211[_0x2f4ab7(0x207)],'expiry_date':_0x4967b8['toLocaleDateString'](_0x2f4ab7(0x21d)),'created_at':new Date()['toISOString'](),'is_active':!![],'owner_uid':CURRENT_UID};db[_0x2f4ab7(0x1f1)](_0x2f4ab7(0x207),_0x59e666=>{const _0x28fa55=_0x2f4ab7;let _0x16fa8f=0x0;while(_0x59e666[_0x28fa55(0x189)](_0x16fa8f['toString']())){_0x16fa8f++;}db[_0x28fa55(0x1f5)](_0x16fa8f)[_0x28fa55(0x1ec)](_0x1e5a10)[_0x28fa55(0x183)](()=>{const _0x47eeef=_0x28fa55;payRef['child'](CURRENT_UID)[_0x47eeef(0x1f1)]('value',_0x5f5881=>{const _0x3bcf18=_0x47eeef;let _0x2c2056=_0x5f5881[_0x3bcf18(0x1ee)]()||0x0;payRef[_0x3bcf18(0x1f5)](CURRENT_UID)[_0x3bcf18(0x1ec)](_0x2c2056+_0x5c3655[_0x3bcf18(0x212)]);}),_0x23a707[_0x47eeef(0x207)]='',_0x1a443f[_0x47eeef(0x207)]='',_0x350211[_0x47eeef(0x207)]='',showToast(_0x47eeef(0x19c)),document[_0x47eeef(0x1ad)](_0x47eeef(0x195))['style'][_0x47eeef(0x1bb)]=_0x47eeef(0x186);});});}function loadPayments(){const _0x3283cc=_0x4f4a48;IS_SUPER?payRef['on']('value',_0x41e6d2=>{const _0x51f209=_0x145a;let _0x1c2a1a=_0x41e6d2['val']()||{},_0x26e140=0x0;_0x41e6d2['forEach'](_0x44cf11=>{const _0x405bb9=_0x145a;_0x26e140+=_0x44cf11[_0x405bb9(0x1ee)]()||0x0;}),document[_0x51f209(0x1ad)](_0x51f209(0x208))[_0x51f209(0x1a1)]='<i\x20class=\x22fa-solid\x20fa-wallet\x22\x20style=\x22color:var(--text-muted);\x20font-size:12px;\x22></i>\x20₹'+_0x26e140;if(document[_0x51f209(0x1ad)](_0x51f209(0x1bd))[_0x51f209(0x170)][_0x51f209(0x220)]('open'))renderWalletManager(_0x1c2a1a);}):payRef[_0x3283cc(0x1f5)](CURRENT_UID)['on']('value',_0x5f1db2=>{const _0x42f155=_0x3283cc;USER_BALANCE=_0x5f1db2['val']()||0x0,document[_0x42f155(0x1ad)]('amountBox')[_0x42f155(0x1a1)]=_0x42f155(0x213)+USER_BALANCE,checkLimitUI();});}function checkLimitUI(){const _0x351827=_0x4f4a48;if(IS_SUPER)return;const _0x37440b=MODES[CURRENT_MODE];USER_BALANCE>=_0x37440b[_0x351827(0x197)]?(document[_0x351827(0x1ad)](_0x351827(0x1b3))[_0x351827(0x170)][_0x351827(0x1b5)]('disabled'),document[_0x351827(0x1ad)](_0x351827(0x1d5))['style'][_0x351827(0x1bb)]=_0x351827(0x209)):(document[_0x351827(0x1ad)]('fabBtn')[_0x351827(0x170)][_0x351827(0x18c)]('disabled'),document[_0x351827(0x1ad)](_0x351827(0x1d5))[_0x351827(0x181)][_0x351827(0x1bb)]=_0x351827(0x186));}function openWalletModal(){const _0x8ccb77=_0x4f4a48;document[_0x8ccb77(0x1ad)](_0x8ccb77(0x1bd))[_0x8ccb77(0x170)][_0x8ccb77(0x1b5)](_0x8ccb77(0x1ac)),payRef[_0x8ccb77(0x1f1)](_0x8ccb77(0x207),_0x13591b=>renderWalletManager(_0x13591b['val']()||{}));}function closeWalletModal(){const _0x520f41=_0x4f4a48;document[_0x520f41(0x1ad)](_0x520f41(0x1bd))[_0x520f41(0x170)][_0x520f41(0x18c)](_0x520f41(0x1ac));}function renderWalletManager(_0x5548b4){const _0x5d3b63=_0x4f4a48,_0x1d49ff=document[_0x5d3b63(0x1ad)]('walletList');_0x1d49ff[_0x5d3b63(0x1a1)]='',Object[_0x5d3b63(0x18e)](_0x5548b4)[_0x5d3b63(0x21b)](_0x3ebfc9=>{const _0x58dfcc=_0x5d3b63;_0x1d49ff[_0x58dfcc(0x1a1)]+=_0x58dfcc(0x185)+_0x3ebfc9['substring'](0x0,0xa)+_0x58dfcc(0x1b7)+_0x5548b4[_0x3ebfc9]+_0x58dfcc(0x1f2)+_0x3ebfc9+_0x58dfcc(0x20c)+_0x3ebfc9+_0x58dfcc(0x1a4);});}function _0x145a(_0x4e4492,_0x38ce83){_0x4e4492=_0x4e4492-0x160;const _0x560823=_0x5608();let _0x145ad2=_0x560823[_0x4e4492];return _0x145ad2;}function updateUserBalance(_0x179568){const _0x29be19=_0x4f4a48,_0x4f122e=document[_0x29be19(0x1ad)]('input_'+_0x179568)[_0x29be19(0x207)];if(_0x4f122e==='')return;payRef[_0x29be19(0x1f5)](_0x179568)[_0x29be19(0x1ec)](parseInt(_0x4f122e))[_0x29be19(0x183)](()=>showToast(_0x29be19(0x18d)));}function setFilter(_0x48a6e6){const _0x24a1df=_0x4f4a48;CURRENT_FILTER=_0x48a6e6,document['querySelectorAll'](_0x24a1df(0x191))[_0x24a1df(0x21b)](_0x1b885b=>_0x1b885b['classList'][_0x24a1df(0x18c)](_0x24a1df(0x1c4))),document['getElementById'](_0x24a1df(0x17a)+_0x48a6e6)[_0x24a1df(0x170)]['add']('active'),render();}function loadData(){const _0x2004ae=_0x4f4a48;db['on'](_0x2004ae(0x207),_0x1d7263=>{const _0x52f42f=_0x2004ae;DATA=_0x1d7263[_0x52f42f(0x1ee)]()||{},render();});}function parseCustomDate(_0x19d9d1){const _0x2fda37=_0x4f4a48;if(!_0x19d9d1)return new Date(0x0);if(_0x19d9d1[_0x2fda37(0x1cc)]('/')){const _0x246712=_0x19d9d1[_0x2fda37(0x1df)]('/');return new Date(_0x246712[0x2],_0x246712[0x1]-0x1,_0x246712[0x0]);}return new Date(_0x19d9d1);}function formatNiceDate(_0xa0c514,_0x29ad1a=![]){const _0x59bfdb=_0x4f4a48;if(isNaN(_0xa0c514)||_0xa0c514[_0x59bfdb(0x1f9)]()===0x0)return _0x59bfdb(0x182);const _0x281bdd={'day':'2-digit','month':_0x59bfdb(0x20b),'year':'numeric'};return _0x29ad1a&&(_0x281bdd[_0x59bfdb(0x173)]=_0x59bfdb(0x200),_0x281bdd[_0x59bfdb(0x167)]=_0x59bfdb(0x200),_0x281bdd[_0x59bfdb(0x199)]=!![]),_0xa0c514[_0x59bfdb(0x1aa)](_0x59bfdb(0x16a),_0x281bdd);}function render(){const _0x48a070=_0x4f4a48,_0x369f51=document[_0x48a070(0x1ad)](_0x48a070(0x1cf)),_0x180166=document[_0x48a070(0x1ad)]('searchBox')[_0x48a070(0x207)][_0x48a070(0x221)]();_0x369f51[_0x48a070(0x1a1)]='';const _0x5150ad=Object[_0x48a070(0x18e)](DATA)[_0x48a070(0x1c9)]((_0x40cda0,_0x3e65dc)=>parseInt(_0x3e65dc)-parseInt(_0x40cda0));let _0x1fa094={'ALL':0x0,'ACTIVE':0x0,'EXPIRED':0x0,'BANNED':0x0},_0x359967=0x0;_0x5150ad[_0x48a070(0x21b)](_0x429e98=>{const _0x4625f7=_0x48a070;let _0x18a56a=DATA[_0x429e98];if(!IS_SUPER&&_0x18a56a[_0x4625f7(0x202)]!==CURRENT_UID)return;let _0x3a8184=parseCustomDate(_0x18a56a[_0x4625f7(0x16f)]),_0x38046a=new Date();_0x38046a[_0x4625f7(0x17e)](0x0,0x0,0x0,0x0);let _0x43b18=_0x3a8184<_0x38046a;_0x1fa094['ALL']++;if(_0x43b18)_0x1fa094['EXPIRED']++;else{if(_0x18a56a[_0x4625f7(0x21c)])_0x1fa094[_0x4625f7(0x1e5)]++;else _0x1fa094[_0x4625f7(0x211)]++;}if(CURRENT_FILTER===_0x4625f7(0x1e5)&&(_0x43b18||!_0x18a56a[_0x4625f7(0x21c)]))return;if(CURRENT_FILTER===_0x4625f7(0x1c8)&&!_0x43b18)return;if(CURRENT_FILTER==='BANNED'&&(_0x43b18||_0x18a56a[_0x4625f7(0x21c)]))return;if(_0x180166&&!(_0x18a56a[_0x4625f7(0x163)]+_0x18a56a[_0x4625f7(0x1b8)]+_0x18a56a[_0x4625f7(0x171)])['toLowerCase']()['includes'](_0x180166))return;let _0x475067=_0x18a56a[_0x4625f7(0x1ba)]?new Date(_0x18a56a[_0x4625f7(0x1ba)]):new Date(0x0),_0x5ddd3a=formatNiceDate(_0x475067,!![]),_0x22ffff=formatNiceDate(_0x3a8184,![]),_0x136a37='';if(_0x43b18)_0x136a37=_0x4625f7(0x1b0);else{if(_0x18a56a['is_active'])_0x136a37=_0x4625f7(0x1d9);else _0x136a37='<span\x20class=\x22status-badge\x20status-banned\x22>Banned</span>';}let _0x247b74=_0x359967*0.05;_0x359967++;if(EDIT_ID===_0x429e98)_0x369f51[_0x4625f7(0x1a1)]+=_0x4625f7(0x17d);else{let _0x396eb7=_0x4625f7(0x214);_0x43b18?_0x396eb7+='<button\x20class=\x22btn\x20btn-sm\x20btn-primary\x22\x20style=\x22font-weight:600;\x20padding:8px\x2016px;\x22\x20onclick=\x22openRenewModal(\x27'+_0x429e98+_0x4625f7(0x1d8):_0x396eb7+=_0x4625f7(0x184)+(_0x18a56a[_0x4625f7(0x21c)]?_0x4625f7(0x217):_0x4625f7(0x224))+_0x4625f7(0x193)+_0x429e98+_0x4625f7(0x222)+(_0x18a56a[_0x4625f7(0x21c)]?_0x4625f7(0x21f):_0x4625f7(0x218))+_0x4625f7(0x1ed)+(_0x18a56a['is_active']?_0x4625f7(0x194):_0x4625f7(0x1af))+_0x4625f7(0x1be),CURRENT_MODE!=='FC'&&!_0x43b18&&_0x18a56a['is_active']&&(_0x396eb7+=_0x4625f7(0x1cd)+_0x429e98+_0x4625f7(0x20e)),_0x396eb7+=_0x4625f7(0x1fb)+_0x429e98+_0x4625f7(0x196)+_0x429e98+_0x4625f7(0x1e4),_0x369f51[_0x4625f7(0x1a1)]+=_0x4625f7(0x165)+_0x247b74+'s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20align-items:flex-start;\x20margin-bottom:\x208px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20style=\x22font-size:\x2016px;\x20letter-spacing:0.5px;\x22>'+(_0x18a56a['nickname']||_0x4625f7(0x1d6))+_0x4625f7(0x1b9)+_0x18a56a[_0x4625f7(0x1b8)]+_0x4625f7(0x1ce)+_0x136a37+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-text\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22letter-spacing:1px;\x22>'+_0x18a56a[_0x4625f7(0x171)]+_0x4625f7(0x1e6)+_0x18a56a['key']+_0x4625f7(0x190)+_0x5ddd3a+_0x4625f7(0x1f0)+(_0x43b18?_0x4625f7(0x188):_0x4625f7(0x1b1))+'\x22>'+_0x22ffff+_0x4625f7(0x1b4)+_0x396eb7+_0x4625f7(0x17c);}}),document[_0x48a070(0x1ad)](_0x48a070(0x1e0))[_0x48a070(0x1fa)]=_0x1fa094[_0x48a070(0x1e3)],document[_0x48a070(0x1ad)](_0x48a070(0x16e))['innerText']=_0x1fa094['ACTIVE'],document[_0x48a070(0x1ad)](_0x48a070(0x1d1))['innerText']=_0x1fa094[_0x48a070(0x1c8)],document[_0x48a070(0x1ad)](_0x48a070(0x19a))['innerText']=_0x1fa094[_0x48a070(0x211)],_0x359967===0x0&&(_0x369f51['innerHTML']=_0x48a070(0x223));}function enableEdit(_0x3b4125){EDIT_ID=_0x3b4125,render();}function cancelEdit(){EDIT_ID=null,render();}function saveEdit(_0x4539c4){const _0x2f26a8=_0x4f4a48;let _0x3b0625=DATA[_0x4539c4];_0x3b0625[_0x2f26a8(0x163)]=document[_0x2f26a8(0x1ad)]('e_nick_'+_0x4539c4)[_0x2f26a8(0x207)],_0x3b0625[_0x2f26a8(0x1b8)]=document[_0x2f26a8(0x1ad)](_0x2f26a8(0x210)+_0x4539c4)[_0x2f26a8(0x207)],_0x3b0625[_0x2f26a8(0x171)]=document[_0x2f26a8(0x1ad)](_0x2f26a8(0x1fe)+_0x4539c4)['value'],_0x3b0625['expiry_date']=document['getElementById']('e_exp_'+_0x4539c4)[_0x2f26a8(0x207)],db[_0x2f26a8(0x1f5)](_0x4539c4)['set'](_0x3b0625)[_0x2f26a8(0x183)](()=>{const _0x190495=_0x2f26a8;showToast(_0x190495(0x179)),EDIT_ID=null;});}function toggleStatus(_0x222bdd){const _0x9de942=_0x4f4a48;DATA[_0x222bdd]['is_active']=!DATA[_0x222bdd][_0x9de942(0x21c)],db['child'](_0x222bdd)['set'](DATA[_0x222bdd]);}function openDeleteModal(_0xfdc9f7){const _0x17e016=_0x4f4a48;TARGET_DELETE_ID=_0xfdc9f7;const _0x1b8553=DATA[_0xfdc9f7],_0x1c5e7b=new Date()['toISOString']()['split']('T')[0x0],_0x3e46cd=MODES[CURRENT_MODE],_0x28f64e=document[_0x17e016(0x1ad)]('refundBadge');_0x1b8553['created_at']&&_0x1b8553['created_at'][_0x17e016(0x1f7)](_0x1c5e7b)?_0x28f64e[_0x17e016(0x1a1)]=_0x17e016(0x1a6)+_0x3e46cd[_0x17e016(0x212)]+_0x17e016(0x20a):_0x28f64e['innerHTML']='<span\x20style=\x22color:var(--text-muted);\x20font-size:13px;\x20display:inline-block;\x20background:rgba(255,255,255,0.05);\x20padding:8px\x2016px;\x20border-radius:12px;\x22><i\x20class=\x22fa-solid\x20fa-circle-info\x22></i>\x20No\x20refund\x20applicable\x20(Old\x20Key)</span>',document[_0x17e016(0x1ad)]('deleteModal')[_0x17e016(0x170)][_0x17e016(0x1b5)](_0x17e016(0x1ac));}function closeDeleteModal(){const _0xcaeb20=_0x4f4a48;document[_0xcaeb20(0x1ad)]('deleteModal')[_0xcaeb20(0x170)]['remove'](_0xcaeb20(0x1ac)),TARGET_DELETE_ID=null;}function confirmDelete(){const _0x222e4c=_0x4f4a48;if(!TARGET_DELETE_ID)return;const _0xbdae99=TARGET_DELETE_ID,_0x47dbdc=DATA[_0xbdae99],_0x2f1e81=new Date()[_0x222e4c(0x19e)]()['split']('T')[0x0],_0x54e78e=MODES[CURRENT_MODE];let _0x21d9bc=_0x47dbdc[_0x222e4c(0x1ba)]&&_0x47dbdc[_0x222e4c(0x1ba)][_0x222e4c(0x1f7)](_0x2f1e81);db['child'](_0xbdae99)['remove']()[_0x222e4c(0x183)](()=>{const _0x15c56e=_0x222e4c;_0x21d9bc?payRef[_0x15c56e(0x1f5)](_0x47dbdc[_0x15c56e(0x202)])[_0x15c56e(0x1f1)]('value',_0x40e8eb=>{const _0x4467cd=_0x15c56e;let _0xb11846=_0x40e8eb[_0x4467cd(0x1ee)]()||0x0;payRef[_0x4467cd(0x1f5)](_0x47dbdc[_0x4467cd(0x202)])['set'](Math['max'](0x0,_0xb11846-_0x54e78e[_0x4467cd(0x212)])),showToast(_0x4467cd(0x215));}):showToast(_0x15c56e(0x1a9)),closeDeleteModal();});}function openRenewModal(_0x496428){const _0x43e793=_0x4f4a48,_0x4ecee9=MODES[CURRENT_MODE];if(!IS_SUPER&&USER_BALANCE>=_0x4ecee9['limit']){showToast(_0x43e793(0x1de));return;}TARGET_RENEW_ID=_0x496428,document[_0x43e793(0x1ad)](_0x43e793(0x176))[_0x43e793(0x1fa)]='₹'+_0x4ecee9[_0x43e793(0x212)],document[_0x43e793(0x1ad)](_0x43e793(0x161))[_0x43e793(0x170)][_0x43e793(0x1b5)](_0x43e793(0x1ac));}function closeRenewModal(){const _0x2abab4=_0x4f4a48;document[_0x2abab4(0x1ad)]('renewModal')[_0x2abab4(0x170)][_0x2abab4(0x18c)](_0x2abab4(0x1ac)),TARGET_RENEW_ID=null;}function confirmRenew(){const _0x4f8acf=_0x4f4a48;if(!TARGET_RENEW_ID)return;const _0x166a06=TARGET_RENEW_ID,_0x969afb=MODES[CURRENT_MODE];let _0x580abb=new Date();_0x580abb[_0x4f8acf(0x18f)](_0x580abb[_0x4f8acf(0x1ea)]()+0x1e),DATA[_0x166a06][_0x4f8acf(0x16f)]=_0x580abb['toLocaleDateString'](_0x4f8acf(0x21d)),DATA[_0x166a06][_0x4f8acf(0x21c)]=!![],db[_0x4f8acf(0x1f5)](_0x166a06)[_0x4f8acf(0x1ec)](DATA[_0x166a06])[_0x4f8acf(0x183)](()=>{const _0x39bcde=_0x4f8acf;payRef[_0x39bcde(0x1f5)](DATA[_0x166a06][_0x39bcde(0x202)])[_0x39bcde(0x1f1)]('value',_0xee7358=>{const _0x5cdff3=_0x39bcde;let _0x47f440=_0xee7358[_0x5cdff3(0x1ee)]()||0x0;payRef[_0x5cdff3(0x1f5)](DATA[_0x166a06]['owner_uid'])[_0x5cdff3(0x1ec)](_0x47f440+_0x969afb[_0x5cdff3(0x212)]);}),showToast(_0x39bcde(0x162)),closeRenewModal();});}function openUpgradeModal(_0x7b62a1){const _0x547dfc=_0x4f4a48,_0x133d19=DATA[_0x7b62a1];if(!_0x133d19)return;const _0xf36f57=parseCustomDate(_0x133d19[_0x547dfc(0x16f)]),_0x127658=new Date();_0x127658[_0x547dfc(0x17e)](0x0,0x0,0x0,0x0);if(_0xf36f57<_0x127658){showToast(_0x547dfc(0x216));return;}if(!_0x133d19[_0x547dfc(0x21c)]){showToast(_0x547dfc(0x1a3));return;}const _0x33a4bb=MODES[CURRENT_MODE],_0x3f5ac0=MODES['FC'],_0x444f4f=_0xf36f57-_0x127658,_0x138820=Math[_0x547dfc(0x160)](_0x444f4f/(0x3e8*0x3c*0x3c*0x18));if(_0x138820<=0x0){showToast(_0x547dfc(0x164));return;}const _0x349512=_0x3f5ac0[_0x547dfc(0x212)]-_0x33a4bb[_0x547dfc(0x212)];if(_0x349512<=0x0){showToast(_0x547dfc(0x1fc));return;}const _0x10828a=Math[_0x547dfc(0x18b)](_0x349512*_0x138820/0x1e);if(_0x10828a<=0x0){showToast(_0x547dfc(0x187));return;}TARGET_UPGRADE_ID=_0x7b62a1,TARGET_UPGRADE_MODE=CURRENT_MODE,UPGRADE_COST=_0x10828a,document[_0x547dfc(0x1ad)]('upgradeRemainingDays')[_0x547dfc(0x1fa)]=_0x138820,document['getElementById']('upgradeCostDisplay')['innerText']='₹'+_0x10828a,document[_0x547dfc(0x1ad)]('upgradeModal')[_0x547dfc(0x170)][_0x547dfc(0x1b5)](_0x547dfc(0x1ac));}function closeUpgradeModal(){const _0x1a4efa=_0x4f4a48;document[_0x1a4efa(0x1ad)](_0x1a4efa(0x1a0))[_0x1a4efa(0x170)][_0x1a4efa(0x18c)](_0x1a4efa(0x1ac)),TARGET_UPGRADE_ID=null,TARGET_UPGRADE_MODE=null,UPGRADE_COST=0x0;}function confirmUpgrade(){const _0x296aff=_0x4f4a48;if(!TARGET_UPGRADE_ID||!TARGET_UPGRADE_MODE)return;const _0x24a123=TARGET_UPGRADE_ID,_0xf16344=TARGET_UPGRADE_MODE,_0x5cf47b=DATA[_0x24a123];if(!_0x5cf47b){closeUpgradeModal();return;}const _0x4002a4=parseCustomDate(_0x5cf47b[_0x296aff(0x16f)]),_0x3601fb=new Date();_0x3601fb[_0x296aff(0x17e)](0x0,0x0,0x0,0x0);if(_0x4002a4<_0x3601fb){showToast(_0x296aff(0x1e7)),closeUpgradeModal();return;}const _0x55b333=MODES['FC'],_0x3e7eb9=MODES[_0xf16344];if(!IS_SUPER){const _0x246acb=firebase[_0x296aff(0x205)]()[_0x296aff(0x1b2)](_0x55b333[_0x296aff(0x1dd)]);_0x246acb[_0x296aff(0x1f5)](_0x5cf47b['owner_uid'])[_0x296aff(0x1f1)](_0x296aff(0x207),_0xa03f87=>{const _0x415603=_0x296aff;let _0x32e5ad=_0xa03f87['val']()||0x0;if(_0x32e5ad+UPGRADE_COST>_0x55b333[_0x415603(0x197)]){showToast(_0x415603(0x203)+_0x55b333['limit']+')'),closeUpgradeModal();return;}performUpgrade(_0x24a123,_0xf16344,_0x5cf47b,_0x55b333,_0x3e7eb9);});}else performUpgrade(_0x24a123,_0xf16344,_0x5cf47b,_0x55b333,_0x3e7eb9);}function performUpgrade(_0x1e5140,_0x4cf9f3,_0x22d378,_0x5267c4,_0x481fa5){const _0x3ac016=_0x4f4a48,_0x5cf744=firebase['database']()[_0x3ac016(0x1b2)](_0x5267c4['db']);_0x5cf744[_0x3ac016(0x1f1)]('value',_0x9bf44c=>{const _0x4f3f5b=_0x3ac016;let _0x3aec1d=0x0;while(_0x9bf44c[_0x4f3f5b(0x189)](_0x3aec1d['toString']()))_0x3aec1d++;const _0x5a8950={..._0x22d378};_0x5cf744[_0x4f3f5b(0x1f5)](_0x3aec1d)[_0x4f3f5b(0x1ec)](_0x5a8950)['then'](()=>{const _0x284921=_0x4f3f5b,_0x52a4e1=firebase['database']()['ref'](_0x481fa5['db']);_0x52a4e1[_0x284921(0x1f5)](_0x1e5140)[_0x284921(0x18c)]()[_0x284921(0x183)](()=>{const _0x5cff7b=_0x284921,_0x3ff9d1=firebase[_0x5cff7b(0x205)]()[_0x5cff7b(0x1b2)](_0x5267c4['payRefPath']);_0x3ff9d1[_0x5cff7b(0x1f5)](_0x22d378['owner_uid'])[_0x5cff7b(0x1f1)](_0x5cff7b(0x207),_0x2db462=>{const _0x39eeac=_0x5cff7b;let _0xb8aeb9=_0x2db462[_0x39eeac(0x1ee)]()||0x0;_0x3ff9d1['child'](_0x22d378[_0x39eeac(0x202)])[_0x39eeac(0x1ec)](_0xb8aeb9+UPGRADE_COST)['then'](()=>{const _0x4ca68a=_0x39eeac;showToast('Upgraded\x20to\x20FC\x20successfully!\x20Additional\x20₹'+UPGRADE_COST+_0x4ca68a(0x219)),closeUpgradeModal();});});})[_0x284921(0x19b)](_0x7be3fe=>{const _0x2dc1a8=_0x284921;showToast(_0x2dc1a8(0x1a5)),console['error'](_0x7be3fe),closeUpgradeModal();});})[_0x4f3f5b(0x19b)](_0x4fe041=>{const _0x5ec6a2=_0x4f3f5b;showToast(_0x5ec6a2(0x1bf)),console[_0x5ec6a2(0x180)](_0x4fe041),closeUpgradeModal();});});}function _0x5608(){const _0x386830=['once','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20gap:8px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22input_','message','replace','child','limitDisplay','startsWith','License\x20Key\x20Copied','getTime','innerText','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-outline\x20btn-sm\x22\x20onclick=\x22enableEdit(\x27','Current\x20plan\x20price\x20is\x20not\x20lower\x20than\x20FC','39275pheVJT','e_key_','panel','2-digit','onAuthStateChanged','owner_uid','Upgrade\x20exceeds\x20FC\x20credit\x20limit\x20(₹','priceDisplay','database','7LnSBgw','value','amountBox','block','\x20will\x20be\x20refunded</span>','short','\x22\x20style=\x22width:80px;\x20margin:0;\x20padding:10px;\x20border-radius:10px;\x20background:rgba(0,0,0,0.5);\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-primary\x20btn-sm\x22\x20style=\x22border-radius:10px;\x22\x20onclick=\x22updateUserBalance(\x27','pass','\x27)\x22><i\x20class=\x22fa-solid\x20fa-arrow-up\x22></i>\x20Upgrade\x20to\x20FC</button>','<i\x20class=\x22fa-solid\x20fa-circle-check\x22\x20style=\x22color:var(--accent);\x20margin-right:8px;\x22></i>\x20','e_dev_','BANNED','price','<i\x20class=\x22fa-solid\x20fa-wallet\x22\x20style=\x22color:var(--text-muted);\x20font-size:12px;\x22></i>\x20₹','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20flex-wrap:wrap;\x20justify-content:flex-end;\x20align-items:center;\x20margin-top:16px;\x20gap:8px;\x22>','License\x20Deleted\x20&\x20Refunded','Cannot\x20upgrade\x20an\x20expired\x20license','btn-outline','fa-check','\x20charged.','body','forEach','is_active','en-GB','4HdiBUS','fa-ban','contains','toLowerCase','\x27)\x22><i\x20class=\x22fa-solid\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fa-solid\x20fa-ghost\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4>No\x20Licenses\x20Found</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>There\x20are\x20no\x20keys\x20matching\x20this\x20criteria.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','btn-success','rhgKYPaqq2Pnpgt2pkuccAZcMxB3','ceil','renewModal','License\x20Renewed\x20Successfully!','nickname','License\x20expires\x20today\x20or\x20already\x20expired','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-row\x22\x20style=\x22animation-delay:\x20','adminControls','minute','30xehlwR','random','en-IN','6262745QKRVyH','SIMPLE/database','Credit\x20Limit\x20Reached','count_ACTIVE','expiry_date','classList','key','flex','hour','payments_RN','signInWithEmailAndPassword','renewCostDisplay','reload','substring','Changes\x20Saved\x20Successfully','filter_','querySelectorAll','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','\x20<!--\x20edit\x20mode\x20unchanged\x20-->\x20','setHours','animation','error','style','N/A','then','<button\x20class=\x22btn\x20btn-sm\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:var(--bg-surface);\x20padding:16px;\x20border-radius:14px;\x20border:1px\x20solid\x20var(--border-color);\x20display:flex;\x20justify-content:space-between;\x20align-items:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;\x20color:var(--text-muted);\x20font-family:monospace;\x20margin-bottom:4px;\x22>UID:\x20','none','Upgrade\x20cost\x20is\x20zero\x20or\x20negative','#fbbf24','hasChild','className','round','remove','Balance\x20Updated','keys','setDate','\x27)\x22\x20title=\x22Copy\x20Key\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22date-info\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22date-col\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span><i\x20class=\x22fa-regular\x20fa-calendar-plus\x22\x20style=\x22opacity:0.7;\x22></i>\x20Created</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>','.filter-btn','Firebase:\x20','\x22\x20onclick=\x22toggleStatus(\x27','Ban','addForm','\x27)\x22\x20title=\x22Edit\x22><i\x20class=\x22fa-solid\x20fa-pen\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-danger\x20btn-sm\x22\x20onclick=\x22openDeleteModal(\x27','limit','Device\x20ID\x20&\x20Key\x20required','hour12','count_BANNED','catch','License\x20Created\x20Successfully','shreeram-605be','toISOString','31049447BbLeul','upgradeModal','innerHTML','onload','Cannot\x20upgrade\x20a\x20banned\x20license','\x27)\x22>Set</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','Error\x20during\x20upgrade\x20(delete)','<span\x20style=\x22background:rgba(16,\x20185,\x20129,\x200.1);\x20color:#34d399;\x20padding:8px\x2016px;\x20border-radius:12px;\x20font-size:13px;\x20font-weight:600;\x20border:\x201px\x20solid\x20rgba(16,\x20185,\x20129,\x200.3);\x20display:inline-block;\x22><i\x20class=\x22fa-solid\x20fa-arrow-rotate-left\x22></i>\x20₹','Reseller','roleTitle','License\x20Deleted\x20Permanently','toLocaleString','shreeram-605be.firebaseapp.com','open','getElementById','AIzaSyAWf9xRzBJAcAUBCNgGrLPPbRVnYMHvuj4','Unban','<span\x20class=\x22status-badge\x20status-expired\x22>Expired</span>','inherit','ref','fabBtn','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','add','loginBox','...</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22color:#fff;\x20font-size:16px;\x20font-weight:600;\x22>₹','device_id','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22font-size:\x2011px;\x20font-family:\x20monospace;\x20color:\x20var(--text-muted);\x20margin-top:\x204px;\x20background:\x20rgba(255,255,255,0.05);\x20padding:\x202px\x206px;\x20border-radius:\x204px;\x20display:inline-block;\x22><i\x20class=\x22fa-solid\x20fa-mobile-screen\x22\x20style=\x22margin-right:4px;\x22></i>\x20','created_at','display','NMSKYC/database','walletModal','</button>','Error\x20during\x20upgrade\x20(write)','SIMPLE','keyval','clipboard','theme','active','show','device','writeText','EXPIRED','sort','loader','26SyInWR','includes','<button\x20class=\x22btn\x20btn-sm\x20btn-upgrade\x22\x20style=\x22background:var(--theme-fc);\x20color:#000;\x20box-shadow:0\x204px\x2010px\x20var(--theme-fc-glow);\x22\x20onclick=\x22openUpgradeModal(\x27','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','list','off','count_EXPIRED','KEY-','5337144tAPnDU','theme-sm','limitMsg','Unnamed\x20User','focus','\x27)\x22><i\x20class=\x22fa-solid\x20fa-bolt\x22></i>\x20Renew</button>','<span\x20class=\x22status-badge\x20status-active\x22>Active</span>','auth','3175659tKRyku','uid','payRefPath','Credit\x20Limit\x20Reached!','split','count_ALL','signOut','initializeApp','ALL','\x27)\x22\x20title=\x22Delete\x22><i\x20class=\x22fa-solid\x20fa-trash\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','ACTIVE','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:var(--bg-surface);\x20padding:6px;\x20border-radius:8px;\x20border:1px\x20solid\x20var(--border-color);\x20display:flex;\x20align-items:center;\x20justify-content:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fa-regular\x20fa-copy\x22\x20onclick=\x22copyKey(\x27','License\x20expired,\x20cannot\x20upgrade','toUpperCase','theme-fc','getDate','8226258juxoVe','set','\x22></i>\x20','val','4224537fykWGs','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22date-col\x22\x20style=\x22text-align:\x20right;\x20align-items:flex-end;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span><i\x20class=\x22fa-regular\x20fa-clock\x22\x20style=\x22opacity:0.7;\x22></i>\x20Expires</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20style=\x22color:\x20'];_0x5608=function(){return _0x386830;};return _0x5608();}function copyKey(_0x5d58ce){const _0x33d8ed=_0x4f4a48;navigator[_0x33d8ed(0x1c2)][_0x33d8ed(0x1c7)](_0x5d58ce)[_0x33d8ed(0x183)](()=>showToast(_0x33d8ed(0x1f8)));}
-   
-   
+    const _0x8830ec=_0x1bbd;(function(_0x29e821,_0x213f9e){const _0x5ee40d=_0x1bbd,_0x54af02=_0x29e821();while(!![]){try{const _0x1b4b65=-parseInt(_0x5ee40d(0x1f5))/0x1+parseInt(_0x5ee40d(0x25c))/0x2*(parseInt(_0x5ee40d(0x1da))/0x3)+-parseInt(_0x5ee40d(0x255))/0x4+-parseInt(_0x5ee40d(0x285))/0x5*(parseInt(_0x5ee40d(0x277))/0x6)+parseInt(_0x5ee40d(0x282))/0x7*(-parseInt(_0x5ee40d(0x218))/0x8)+-parseInt(_0x5ee40d(0x233))/0x9+parseInt(_0x5ee40d(0x219))/0xa;if(_0x1b4b65===_0x213f9e)break;else _0x54af02['push'](_0x54af02['shift']());}catch(_0x3aa3ce){_0x54af02['push'](_0x54af02['shift']());}}}(_0x150d,0x2b5db));const MODES={'FC':{'db':_0x8830ec(0x21e),'payRefPath':_0x8830ec(0x20f),'price':0x9c4,'limit':0x2710,'name':'FC','theme':_0x8830ec(0x266)},'SIMPLE':{'db':'SIMPLE/database','payRefPath':_0x8830ec(0x1f6),'price':0x4b0,'limit':0x1770,'name':'SIMPLE','theme':_0x8830ec(0x212)},'RN':{'db':'NMSKYC/database','payRefPath':_0x8830ec(0x1f4),'price':0x708,'limit':0x1770,'name':'RN','theme':_0x8830ec(0x217)}};function _0x150d(){const _0x3bca11=['onload','en-IN','e_exp_','database','disabled','renewCostDisplay','price','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','device','active','none','.filter-btn','Super\x20Admin','shreeram-605be.firebaseapp.com','substring','className','fabBtn','auth','max','email','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:flex-end;\x20align-items:center;\x20margin-top:16px;\x20gap:8px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Unban','uid','2-digit','3036267iSBiIb','toast','<span\x20class=\x22status-badge\x20status-banned\x22>Banned</span>','\x22\x20style=\x22width:80px;\x20margin:0;\x20padding:10px;\x20border-radius:10px;\x20background:rgba(0,0,0,0.5);\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-primary\x20btn-sm\x22\x20style=\x22border-radius:10px;\x22\x20onclick=\x22updateUserBalance(\x27','\x27)\x22>Set</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','e_dev_','body','loader','expiry_date','refundBadge','innerHTML','tab_','fa-check','toString','License\x20Key\x20Copied','License\x20Deleted\x20&\x20Refunded','onAuthStateChanged','catch','once','rhgKYPaqq2Pnpgt2pkuccAZcMxB3','writeText','shreeram-605be','amountBox','toLowerCase','\x27)\x22><i\x20class=\x22fa-solid\x20','message','filter_','includes','limitMsg','toUpperCase','count_EXPIRED','pass','signOut','e_nick_','1291964TLelbo','limit','show','</button>','\x22\x20style=\x22margin-bottom:10px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_key_','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20gap:8px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22input_','owner_uid','58EHiPhY','device_id','value','created_at','limitDisplay','renewModal','querySelectorAll','payRefPath','clipboard','searchBox','theme-fc','AIzaSyAWf9xRzBJAcAUBCNgGrLPPbRVnYMHvuj4','toISOString','ref','Ban\x20User','is_active','slideUpFade\x200.3s\x20ease\x20forwards','getElementById','getDate','Balance\x20Updated','https://shreeram-605be-default-rtdb.asia-southeast1.firebasedatabase.app','walletList','addForm','off','roleTitle','forEach','count_BANNED','846phUGnx','\x20style=\x22margin-bottom:16px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20gap:10px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-outline\x22\x20onclick=\x22cancelEdit()\x22>Cancel</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-primary\x22\x20onclick=\x22saveEdit(\x27','input_','val','EXPIRED','signInWithEmailAndPassword','\x27)\x22\x20title=\x22Copy\x20Key\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22date-info\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22date-col\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span><i\x20class=\x22fa-regular\x20fa-calendar-plus\x22\x20style=\x22opacity:0.7;\x22></i>\x20Created</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>','\x27)\x22><i\x20class=\x22fa-solid\x20fa-check\x22></i>\x20Save\x20Changes</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','License\x20Renewed\x20Successfully!','style','nickname','7pzPfmB','count_ALL','set','1315uvHBjh','Firebase:\x20','keys','fa-ban','key','block','btn-success','hasChild','startsWith','s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20align-items:flex-start;\x20margin-bottom:\x208px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20style=\x22font-size:\x2016px;\x20letter-spacing:0.5px;\x22>','BANNED','numeric','26850qObFEL','ACTIVE','animation','\x20style=\x22margin-bottom:10px;\x20font-family:monospace;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_exp_','Credit\x20Limit\x20Reached!','\x22></i>\x20','License\x20Created\x20Successfully','Credit\x20Limit\x20Reached','short','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-outline\x20btn-sm\x22\x20onclick=\x22enableEdit(\x27','setHours','random','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-row\x22\x20style=\x22animation-delay:\x20','add','replace','then','<i\x20class=\x22fa-solid\x20fa-wallet\x22\x20style=\x22color:var(--text-muted);\x20font-size:12px;\x22></i>\x20₹','walletModal','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22date-col\x22\x20style=\x22text-align:\x20right;\x20align-items:flex-end;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span><i\x20class=\x22fa-regular\x20fa-clock\x22\x20style=\x22opacity:0.7;\x22></i>\x20Expires</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20style=\x22color:\x20','flex','loginBox','btn-outline','theme','\x22\x20onclick=\x22toggleStatus(\x27','open','keyval','payments_RN','153797lzJxxC','payments_SIMPLE','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:var(--bg-surface);\x20padding:6px;\x20border-radius:8px;\x20border:1px\x20solid\x20var(--border-color);\x20display:flex;\x20align-items:center;\x20justify-content:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fa-regular\x20fa-copy\x22\x20onclick=\x22copyKey(\x27','ALL','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22font-size:\x2011px;\x20font-family:\x20monospace;\x20color:\x20var(--text-muted);\x20margin-top:\x204px;\x20background:\x20rgba(255,255,255,0.05);\x20padding:\x202px\x206px;\x20border-radius:\x204px;\x20display:inline-block;\x22><i\x20class=\x22fa-solid\x20fa-mobile-screen\x22\x20style=\x22margin-right:4px;\x22></i>\x20','remove','\x27)\x22\x20title=\x22Edit\x22><i\x20class=\x22fa-solid\x20fa-pen\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-danger\x20btn-sm\x22\x20onclick=\x22openDeleteModal(\x27','<button\x20class=\x22btn\x20btn-sm\x20','en-GB','panel','innerText','\x22\x20value=\x22','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fa-solid\x20fa-ghost\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4>No\x20Licenses\x20Found</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>There\x20are\x20no\x20keys\x20matching\x20this\x20criteria.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','<button\x20class=\x22btn\x20btn-sm\x20btn-primary\x22\x20style=\x22font-weight:600;\x20padding:8px\x2016px;\x22\x20onclick=\x22openRenewModal(\x27','Reseller','toLocaleDateString','focus','display','N/A','\x27)\x22\x20title=\x22Delete\x22><i\x20class=\x22fa-solid\x20fa-trash\x22></i></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','\x20style=\x22margin-bottom:10px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_dev_','\x27)\x22><i\x20class=\x22fa-solid\x20fa-bolt\x22></i>\x20Renew</button>','hour12','<span\x20class=\x22status-badge\x20status-active\x22>Active</span>','<span\x20style=\x22background:rgba(16,\x20185,\x20129,\x200.1);\x20color:#34d399;\x20padding:8px\x2016px;\x20border-radius:12px;\x20font-size:13px;\x20font-weight:600;\x20border:\x201px\x20solid\x20rgba(16,\x20185,\x20129,\x200.3);\x20display:inline-block;\x22><i\x20class=\x22fa-solid\x20fa-arrow-rotate-left\x22></i>\x20₹','child','payments','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:var(--bg-surface);\x20padding:16px;\x20border-radius:14px;\x20border:1px\x20solid\x20var(--border-color);\x20display:flex;\x20justify-content:space-between;\x20align-items:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:11px;\x20color:var(--text-muted);\x20font-family:monospace;\x20margin-bottom:4px;\x22>UID:\x20','...</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22color:#fff;\x20font-size:16px;\x20font-weight:600;\x22>₹','theme-sm','split','Unnamed\x20User','adminControls','classList','theme-rn','1989656IbBPSs','10180180wPWrtW','setDate'];_0x150d=function(){return _0x3bca11;};return _0x150d();}let CURRENT_MODE='FC',CURRENT_FILTER=_0x8830ec(0x1f8);window[_0x8830ec(0x21b)]=()=>{const _0x451651=_0x8830ec;setTimeout(()=>document[_0x451651(0x26d)](_0x451651(0x23a))[_0x451651(0x280)]['display']=_0x451651(0x225),0x320);};function showToast(_0x2fbedb){const _0x3c6737=_0x8830ec,_0x3bd405=document[_0x3c6737(0x26d)](_0x3c6737(0x234));_0x3bd405[_0x3c6737(0x23d)]='<i\x20class=\x22fa-solid\x20fa-circle-check\x22\x20style=\x22color:var(--accent);\x20margin-right:8px;\x22></i>\x20'+_0x2fbedb,_0x3bd405[_0x3c6737(0x216)]['add']('show'),setTimeout(()=>_0x3bd405[_0x3c6737(0x216)][_0x3c6737(0x1fa)](_0x3c6737(0x257)),0xdac);}const firebaseConfig={'apiKey':_0x8830ec(0x267),'authDomain':_0x8830ec(0x228),'databaseURL':_0x8830ec(0x270),'projectId':_0x8830ec(0x248)};function _0x1bbd(_0x28be20,_0x475427){_0x28be20=_0x28be20-0x1cf;const _0x150dbe=_0x150d();let _0x1bbd8c=_0x150dbe[_0x28be20];return _0x1bbd8c;}firebase['initializeApp'](firebaseConfig);const SUPER_ADMIN_UID=_0x8830ec(0x246);let CURRENT_UID=null,IS_SUPER=![],db=null,payRef=null,DATA={},USER_BALANCE=0x0,EDIT_ID=null,TARGET_DELETE_ID=null,TARGET_RENEW_ID=null;function switchMode(_0x155290){const _0x3e25f1=_0x8830ec;CURRENT_MODE=_0x155290;const _0xa879bf=MODES[_0x155290];document[_0x3e25f1(0x239)][_0x3e25f1(0x22a)]=_0xa879bf[_0x3e25f1(0x1f0)],document[_0x3e25f1(0x262)]('.nav-item')['forEach'](_0x3c1414=>_0x3c1414[_0x3e25f1(0x216)][_0x3e25f1(0x1fa)](_0x3e25f1(0x224))),document['getElementById'](_0x3e25f1(0x23e)+_0x155290)['classList'][_0x3e25f1(0x1e7)](_0x3e25f1(0x224)),document['getElementById']('priceDisplay')[_0x3e25f1(0x1ff)]='₹'+_0xa879bf[_0x3e25f1(0x221)],document[_0x3e25f1(0x26d)](_0x3e25f1(0x260))['innerText']='₹'+_0xa879bf[_0x3e25f1(0x256)];if(db)db[_0x3e25f1(0x273)]();if(payRef)payRef[_0x3e25f1(0x273)]();if(payRef&&!IS_SUPER)payRef[_0x3e25f1(0x20e)](CURRENT_UID)['off']();db=firebase[_0x3e25f1(0x21e)]()[_0x3e25f1(0x269)](_0xa879bf['db']),payRef=firebase['database']()[_0x3e25f1(0x269)](_0xa879bf[_0x3e25f1(0x263)]),loadData(),loadPayments();}firebase[_0x8830ec(0x22c)]()[_0x8830ec(0x243)](_0x5c5043=>{const _0x506063=_0x8830ec;_0x5c5043&&(CURRENT_UID=_0x5c5043[_0x506063(0x231)],document[_0x506063(0x26d)](_0x506063(0x1ee))['style']['display']=_0x506063(0x225),document[_0x506063(0x26d)](_0x506063(0x1fe))['style']['display']='block',_0x5c5043['uid']===SUPER_ADMIN_UID?(IS_SUPER=!![],document[_0x506063(0x26d)](_0x506063(0x274))[_0x506063(0x1ff)]=_0x506063(0x227),document[_0x506063(0x26d)](_0x506063(0x215))[_0x506063(0x280)]['display']=_0x506063(0x1d3)):(document[_0x506063(0x26d)](_0x506063(0x274))[_0x506063(0x1ff)]=_0x506063(0x203),document[_0x506063(0x26d)](_0x506063(0x215))[_0x506063(0x280)][_0x506063(0x206)]='none'),switchMode('FC'));});function login(){const _0xf1bc44=_0x8830ec,_0x3e643b=document[_0xf1bc44(0x26d)](_0xf1bc44(0x22e))['value'],_0x17def5=document[_0xf1bc44(0x26d)](_0xf1bc44(0x252))[_0xf1bc44(0x25e)];document['getElementById'](_0xf1bc44(0x23a))[_0xf1bc44(0x280)][_0xf1bc44(0x206)]=_0xf1bc44(0x1ed),firebase[_0xf1bc44(0x22c)]()[_0xf1bc44(0x27c)](_0x3e643b,_0x17def5)['then'](()=>{const _0x4b3627=_0xf1bc44;document[_0x4b3627(0x26d)](_0x4b3627(0x23a))[_0x4b3627(0x280)][_0x4b3627(0x206)]='none';})[_0xf1bc44(0x244)](_0x52073b=>{const _0x5e3faf=_0xf1bc44;document[_0x5e3faf(0x26d)](_0x5e3faf(0x23a))[_0x5e3faf(0x280)]['display']=_0x5e3faf(0x225),showToast(_0x52073b[_0x5e3faf(0x24c)][_0x5e3faf(0x1e8)](_0x5e3faf(0x1cf),''));});}function logout(){const _0x2e05a3=_0x8830ec;firebase[_0x2e05a3(0x22c)]()[_0x2e05a3(0x253)](),location['reload']();}function generateKey(){const _0x30bf13=_0x8830ec;return'KEY-'+Math[_0x30bf13(0x1e5)]()[_0x30bf13(0x240)](0x24)['substring'](0x2,0xa)[_0x30bf13(0x250)]();}function toggleAddForm(){const _0x56c457=_0x8830ec,_0x158e46=MODES[CURRENT_MODE];if(USER_BALANCE>=_0x158e46[_0x56c457(0x256)]&&!IS_SUPER){showToast(_0x56c457(0x1e1));return;}const _0x4c135e=document[_0x56c457(0x26d)]('addForm'),_0x481471=_0x4c135e[_0x56c457(0x280)][_0x56c457(0x206)]===_0x56c457(0x225);_0x4c135e[_0x56c457(0x280)]['display']=_0x481471?'block':_0x56c457(0x225),_0x481471&&(_0x4c135e[_0x56c457(0x280)][_0x56c457(0x1dc)]=_0x56c457(0x26c),document[_0x56c457(0x26d)](_0x56c457(0x223))[_0x56c457(0x205)]());}function addKey(){const _0x579244=_0x8830ec,_0x3be37e=MODES[CURRENT_MODE];if(!IS_SUPER&&USER_BALANCE>=_0x3be37e['limit']){showToast(_0x579244(0x1de));return;}const _0x1595b2=document[_0x579244(0x26d)](_0x579244(0x223)),_0x4511ae=document[_0x579244(0x26d)](_0x579244(0x281)),_0x1ed691=document[_0x579244(0x26d)](_0x579244(0x1f3));if(!_0x1595b2[_0x579244(0x25e)]||!_0x1ed691[_0x579244(0x25e)]){showToast('Device\x20ID\x20&\x20Key\x20required');return;}let _0xe92477=new Date();_0xe92477[_0x579244(0x21a)](_0xe92477['getDate']()+0x1e);const _0x5ef16c={'device_id':_0x1595b2['value'],'nickname':_0x4511ae[_0x579244(0x25e)],'key':_0x1ed691['value'],'expiry_date':_0xe92477['toLocaleDateString']('en-GB'),'created_at':new Date()[_0x579244(0x268)](),'is_active':!![],'owner_uid':CURRENT_UID};db['once'](_0x579244(0x25e),_0x954852=>{const _0x705faf=_0x579244;let _0x59658d=0x0;while(_0x954852[_0x705faf(0x1d5)](_0x59658d['toString']())){_0x59658d++;}db['child'](_0x59658d)[_0x705faf(0x284)](_0x5ef16c)[_0x705faf(0x1e9)](()=>{const _0x52445b=_0x705faf;payRef[_0x52445b(0x20e)](CURRENT_UID)['once'](_0x52445b(0x25e),_0x7a1b6f=>{const _0x5e6d59=_0x52445b;let _0x77277e=_0x7a1b6f['val']()||0x0;payRef['child'](CURRENT_UID)[_0x5e6d59(0x284)](_0x77277e+_0x3be37e[_0x5e6d59(0x221)]);}),_0x1595b2['value']='',_0x4511ae[_0x52445b(0x25e)]='',_0x1ed691[_0x52445b(0x25e)]='',showToast(_0x52445b(0x1e0)),document[_0x52445b(0x26d)](_0x52445b(0x272))['style'][_0x52445b(0x206)]=_0x52445b(0x225);});});}function loadPayments(){const _0x48f156=_0x8830ec;IS_SUPER?payRef['on'](_0x48f156(0x25e),_0x1cc0ce=>{const _0x93c587=_0x48f156;let _0x3b6722=_0x1cc0ce[_0x93c587(0x27a)]()||{},_0x10ec76=0x0;_0x1cc0ce[_0x93c587(0x275)](_0x114b0c=>{const _0x521bed=_0x93c587;_0x10ec76+=_0x114b0c[_0x521bed(0x27a)]()||0x0;}),document[_0x93c587(0x26d)](_0x93c587(0x249))[_0x93c587(0x23d)]=_0x93c587(0x1ea)+_0x10ec76;if(document['getElementById'](_0x93c587(0x1eb))[_0x93c587(0x216)]['contains'](_0x93c587(0x1f2)))renderWalletManager(_0x3b6722);}):payRef[_0x48f156(0x20e)](CURRENT_UID)['on']('value',_0x50363d=>{const _0x2db02b=_0x48f156;USER_BALANCE=_0x50363d['val']()||0x0,document[_0x2db02b(0x26d)]('amountBox')[_0x2db02b(0x23d)]=_0x2db02b(0x1ea)+USER_BALANCE,checkLimitUI();});}function checkLimitUI(){const _0x414a15=_0x8830ec;if(IS_SUPER)return;const _0x1b7290=MODES[CURRENT_MODE];USER_BALANCE>=_0x1b7290[_0x414a15(0x256)]?(document[_0x414a15(0x26d)]('fabBtn')[_0x414a15(0x216)][_0x414a15(0x1e7)](_0x414a15(0x21f)),document[_0x414a15(0x26d)]('limitMsg')['style']['display']=_0x414a15(0x1d3)):(document[_0x414a15(0x26d)](_0x414a15(0x22b))[_0x414a15(0x216)][_0x414a15(0x1fa)](_0x414a15(0x21f)),document['getElementById'](_0x414a15(0x24f))[_0x414a15(0x280)]['display']=_0x414a15(0x225));}function openWalletModal(){const _0x1b9602=_0x8830ec;document[_0x1b9602(0x26d)](_0x1b9602(0x1eb))[_0x1b9602(0x216)][_0x1b9602(0x1e7)](_0x1b9602(0x1f2)),payRef[_0x1b9602(0x245)](_0x1b9602(0x25e),_0x471e92=>renderWalletManager(_0x471e92[_0x1b9602(0x27a)]()||{}));}function closeWalletModal(){const _0x22134a=_0x8830ec;document[_0x22134a(0x26d)](_0x22134a(0x1eb))['classList'][_0x22134a(0x1fa)]('open');}function renderWalletManager(_0x182403){const _0x2efead=_0x8830ec,_0x5bc04f=document[_0x2efead(0x26d)](_0x2efead(0x271));_0x5bc04f[_0x2efead(0x23d)]='',Object[_0x2efead(0x1d0)](_0x182403)[_0x2efead(0x275)](_0xe37155=>{const _0xc266bf=_0x2efead;_0x5bc04f[_0xc266bf(0x23d)]+=_0xc266bf(0x210)+_0xe37155[_0xc266bf(0x229)](0x0,0xa)+_0xc266bf(0x211)+_0x182403[_0xe37155]+_0xc266bf(0x25a)+_0xe37155+_0xc266bf(0x236)+_0xe37155+_0xc266bf(0x237);});}function updateUserBalance(_0x128157){const _0x5a9995=_0x8830ec,_0x12dc55=document[_0x5a9995(0x26d)](_0x5a9995(0x279)+_0x128157)[_0x5a9995(0x25e)];if(_0x12dc55==='')return;payRef[_0x5a9995(0x20e)](_0x128157)['set'](parseInt(_0x12dc55))[_0x5a9995(0x1e9)](()=>showToast(_0x5a9995(0x26f)));}function setFilter(_0x16fbc1){const _0x2f621c=_0x8830ec;CURRENT_FILTER=_0x16fbc1,document['querySelectorAll'](_0x2f621c(0x226))[_0x2f621c(0x275)](_0x206447=>_0x206447[_0x2f621c(0x216)][_0x2f621c(0x1fa)](_0x2f621c(0x224))),document['getElementById'](_0x2f621c(0x24d)+_0x16fbc1)[_0x2f621c(0x216)]['add'](_0x2f621c(0x224)),render();}function loadData(){const _0x5e4d7e=_0x8830ec;db['on'](_0x5e4d7e(0x25e),_0x32d803=>{const _0x44fc24=_0x5e4d7e;DATA=_0x32d803[_0x44fc24(0x27a)]()||{},render();});}function parseCustomDate(_0x3ab74a){const _0x156e74=_0x8830ec;if(!_0x3ab74a)return new Date(0x0);if(_0x3ab74a[_0x156e74(0x24e)]('/')){const _0xb2537b=_0x3ab74a[_0x156e74(0x213)]('/');return new Date(_0xb2537b[0x2],_0xb2537b[0x1]-0x1,_0xb2537b[0x0]);}return new Date(_0x3ab74a);}function formatNiceDate(_0x20bab4,_0x26e64f=![]){const _0x1d2e0a=_0x8830ec;if(isNaN(_0x20bab4)||_0x20bab4['getTime']()===0x0)return _0x1d2e0a(0x207);const _0x4b91cf={'day':_0x1d2e0a(0x232),'month':_0x1d2e0a(0x1e2),'year':_0x1d2e0a(0x1d9)};return _0x26e64f&&(_0x4b91cf['hour']='2-digit',_0x4b91cf['minute']=_0x1d2e0a(0x232),_0x4b91cf[_0x1d2e0a(0x20b)]=!![]),_0x20bab4['toLocaleString'](_0x1d2e0a(0x21c),_0x4b91cf);}function openRenewModal(_0x8a1d7f){const _0x58ff08=_0x8830ec,_0x1b623e=MODES[CURRENT_MODE];if(!IS_SUPER&&USER_BALANCE>=_0x1b623e[_0x58ff08(0x256)]){showToast(_0x58ff08(0x1de));return;}TARGET_RENEW_ID=_0x8a1d7f,document[_0x58ff08(0x26d)](_0x58ff08(0x220))['innerText']='₹'+_0x1b623e[_0x58ff08(0x221)],document[_0x58ff08(0x26d)](_0x58ff08(0x261))['classList'][_0x58ff08(0x1e7)](_0x58ff08(0x1f2));}function closeRenewModal(){const _0x37a2d3=_0x8830ec;document[_0x37a2d3(0x26d)]('renewModal')[_0x37a2d3(0x216)]['remove'](_0x37a2d3(0x1f2)),TARGET_RENEW_ID=null;}function confirmRenew(){const _0x1e5eec=_0x8830ec;if(!TARGET_RENEW_ID)return;const _0xad0262=TARGET_RENEW_ID,_0x23a191=MODES[CURRENT_MODE];let _0x82f7c4=new Date();_0x82f7c4[_0x1e5eec(0x21a)](_0x82f7c4[_0x1e5eec(0x26e)]()+0x1e),DATA[_0xad0262][_0x1e5eec(0x23b)]=_0x82f7c4[_0x1e5eec(0x204)](_0x1e5eec(0x1fd)),DATA[_0xad0262][_0x1e5eec(0x26b)]=!![],db[_0x1e5eec(0x20e)](_0xad0262)['set'](DATA[_0xad0262])[_0x1e5eec(0x1e9)](()=>{const _0xd65ecf=_0x1e5eec;payRef['child'](DATA[_0xad0262]['owner_uid'])['once'](_0xd65ecf(0x25e),_0x262a1a=>{const _0x4b1149=_0xd65ecf;let _0x40950c=_0x262a1a[_0x4b1149(0x27a)]()||0x0;payRef[_0x4b1149(0x20e)](DATA[_0xad0262][_0x4b1149(0x25b)])[_0x4b1149(0x284)](_0x40950c+_0x23a191[_0x4b1149(0x221)]);}),showToast(_0xd65ecf(0x27f)),closeRenewModal();});}function render(){const _0x2d67d1=_0x8830ec,_0x22e79e=document[_0x2d67d1(0x26d)]('list'),_0x8c0ae5=document[_0x2d67d1(0x26d)](_0x2d67d1(0x265))[_0x2d67d1(0x25e)][_0x2d67d1(0x24a)]();_0x22e79e[_0x2d67d1(0x23d)]='';const _0x2cc928=Object[_0x2d67d1(0x1d0)](DATA)['sort']((_0x97db3d,_0x44303f)=>parseInt(_0x44303f)-parseInt(_0x97db3d));let _0x502451={'ALL':0x0,'ACTIVE':0x0,'EXPIRED':0x0,'BANNED':0x0},_0xaaba06=0x0;_0x2cc928[_0x2d67d1(0x275)](_0xe10c7=>{const _0x2e0697=_0x2d67d1;let _0x4aaf40=DATA[_0xe10c7];if(!IS_SUPER&&_0x4aaf40[_0x2e0697(0x25b)]!==CURRENT_UID)return;let _0x2f7ded=parseCustomDate(_0x4aaf40[_0x2e0697(0x23b)]),_0x25f1ff=_0x2f7ded<new Date(new Date()[_0x2e0697(0x1e4)](0x0,0x0,0x0,0x0));_0x502451['ALL']++;if(_0x25f1ff)_0x502451[_0x2e0697(0x27b)]++;else{if(_0x4aaf40[_0x2e0697(0x26b)])_0x502451['ACTIVE']++;else _0x502451[_0x2e0697(0x1d8)]++;}if(CURRENT_FILTER===_0x2e0697(0x1db)&&(_0x25f1ff||!_0x4aaf40[_0x2e0697(0x26b)]))return;if(CURRENT_FILTER==='EXPIRED'&&!_0x25f1ff)return;if(CURRENT_FILTER===_0x2e0697(0x1d8)&&(_0x25f1ff||_0x4aaf40[_0x2e0697(0x26b)]))return;if(_0x8c0ae5&&!(_0x4aaf40['nickname']+_0x4aaf40['device_id']+_0x4aaf40[_0x2e0697(0x1d2)])[_0x2e0697(0x24a)]()[_0x2e0697(0x24e)](_0x8c0ae5))return;let _0x2d2e45=_0x4aaf40['created_at']?new Date(_0x4aaf40[_0x2e0697(0x25f)]):new Date(0x0),_0x467977=formatNiceDate(_0x2d2e45,!![]),_0x9465cf=formatNiceDate(_0x2f7ded,![]),_0x2c92d4='';if(_0x25f1ff)_0x2c92d4='<span\x20class=\x22status-badge\x20status-expired\x22>Expired</span>';else{if(_0x4aaf40[_0x2e0697(0x26b)])_0x2c92d4=_0x2e0697(0x20c);else _0x2c92d4=_0x2e0697(0x235);}let _0x39ce4b=_0xaaba06*0.05;_0xaaba06++,EDIT_ID===_0xe10c7?_0x22e79e['innerHTML']+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-row\x22\x20style=\x22border-color:var(--accent);\x20animation-delay:\x200s;\x20opacity:1;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22e_nick_'+_0xe10c7+_0x2e0697(0x200)+_0x4aaf40[_0x2e0697(0x281)]+'\x22\x20'+(!IS_SUPER?_0x2e0697(0x21f):'')+_0x2e0697(0x209)+_0xe10c7+_0x2e0697(0x200)+_0x4aaf40[_0x2e0697(0x25d)]+_0x2e0697(0x259)+_0xe10c7+_0x2e0697(0x200)+_0x4aaf40[_0x2e0697(0x1d2)]+'\x22\x20'+(!IS_SUPER?'disabled':'')+_0x2e0697(0x1dd)+_0xe10c7+_0x2e0697(0x200)+_0x4aaf40['expiry_date']+'\x22\x20'+(!IS_SUPER?_0x2e0697(0x21f):'')+_0x2e0697(0x278)+_0xe10c7+_0x2e0697(0x27e):_0x22e79e[_0x2e0697(0x23d)]+=_0x2e0697(0x1e6)+_0x39ce4b+_0x2e0697(0x1d7)+(_0x4aaf40[_0x2e0697(0x281)]||_0x2e0697(0x214))+_0x2e0697(0x1f9)+_0x4aaf40[_0x2e0697(0x25d)]+_0x2e0697(0x222)+_0x2c92d4+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22key-text\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22letter-spacing:1px;\x22>'+_0x4aaf40[_0x2e0697(0x1d2)]+_0x2e0697(0x1f7)+_0x4aaf40[_0x2e0697(0x1d2)]+_0x2e0697(0x27d)+_0x467977+_0x2e0697(0x1ec)+(_0x25f1ff?'#fbbf24':'inherit')+'\x22>'+_0x9465cf+_0x2e0697(0x22f)+(_0x25f1ff?_0x2e0697(0x202)+_0xe10c7+_0x2e0697(0x20a):_0x2e0697(0x1fc)+(_0x4aaf40['is_active']?_0x2e0697(0x1ef):_0x2e0697(0x1d4))+_0x2e0697(0x1f1)+_0xe10c7+_0x2e0697(0x24b)+(_0x4aaf40[_0x2e0697(0x26b)]?_0x2e0697(0x1d1):_0x2e0697(0x23f))+_0x2e0697(0x1df)+(_0x4aaf40[_0x2e0697(0x26b)]?_0x2e0697(0x26a):_0x2e0697(0x230))+_0x2e0697(0x258))+_0x2e0697(0x1e3)+_0xe10c7+_0x2e0697(0x1fb)+_0xe10c7+_0x2e0697(0x208);}),document[_0x2d67d1(0x26d)](_0x2d67d1(0x283))['innerText']=_0x502451['ALL'],document[_0x2d67d1(0x26d)]('count_ACTIVE')[_0x2d67d1(0x1ff)]=_0x502451[_0x2d67d1(0x1db)],document[_0x2d67d1(0x26d)](_0x2d67d1(0x251))[_0x2d67d1(0x1ff)]=_0x502451['EXPIRED'],document[_0x2d67d1(0x26d)](_0x2d67d1(0x276))[_0x2d67d1(0x1ff)]=_0x502451[_0x2d67d1(0x1d8)],_0xaaba06===0x0&&(_0x22e79e['innerHTML']=_0x2d67d1(0x201));}function enableEdit(_0x1b706e){EDIT_ID=_0x1b706e,render();}function cancelEdit(){EDIT_ID=null,render();}function saveEdit(_0x4480a5){const _0x5d4382=_0x8830ec;let _0x4b5826=DATA[_0x4480a5];_0x4b5826[_0x5d4382(0x281)]=document[_0x5d4382(0x26d)](_0x5d4382(0x254)+_0x4480a5)[_0x5d4382(0x25e)],_0x4b5826['device_id']=document[_0x5d4382(0x26d)](_0x5d4382(0x238)+_0x4480a5)[_0x5d4382(0x25e)],_0x4b5826[_0x5d4382(0x1d2)]=document[_0x5d4382(0x26d)]('e_key_'+_0x4480a5)[_0x5d4382(0x25e)],_0x4b5826[_0x5d4382(0x23b)]=document[_0x5d4382(0x26d)](_0x5d4382(0x21d)+_0x4480a5)[_0x5d4382(0x25e)],db[_0x5d4382(0x20e)](_0x4480a5)[_0x5d4382(0x284)](_0x4b5826)['then'](()=>{showToast('Changes\x20Saved\x20Successfully'),EDIT_ID=null;});}function toggleStatus(_0x326bcc){const _0x338416=_0x8830ec;DATA[_0x326bcc]['is_active']=!DATA[_0x326bcc]['is_active'],db[_0x338416(0x20e)](_0x326bcc)[_0x338416(0x284)](DATA[_0x326bcc]);}function openDeleteModal(_0x25ff33){const _0x4db008=_0x8830ec;TARGET_DELETE_ID=_0x25ff33;const _0x5281b6=DATA[_0x25ff33],_0x23ca41=new Date()['toISOString']()[_0x4db008(0x213)]('T')[0x0],_0x3e7d4c=MODES[CURRENT_MODE],_0x267dc3=document[_0x4db008(0x26d)](_0x4db008(0x23c));_0x5281b6[_0x4db008(0x25f)]&&_0x5281b6['created_at'][_0x4db008(0x1d6)](_0x23ca41)?_0x267dc3['innerHTML']=_0x4db008(0x20d)+_0x3e7d4c['price']+'\x20will\x20be\x20refunded</span>':_0x267dc3[_0x4db008(0x23d)]='<span\x20style=\x22color:var(--text-muted);\x20font-size:13px;\x20display:inline-block;\x20background:rgba(255,255,255,0.05);\x20padding:8px\x2016px;\x20border-radius:12px;\x22><i\x20class=\x22fa-solid\x20fa-circle-info\x22></i>\x20No\x20refund\x20applicable\x20(Old\x20Key)</span>',document[_0x4db008(0x26d)]('deleteModal')[_0x4db008(0x216)][_0x4db008(0x1e7)]('open');}function closeDeleteModal(){const _0xd795ab=_0x8830ec;document['getElementById']('deleteModal')[_0xd795ab(0x216)][_0xd795ab(0x1fa)]('open'),TARGET_DELETE_ID=null;}function confirmDelete(){const _0x7bf114=_0x8830ec;if(!TARGET_DELETE_ID)return;const _0x4f3129=TARGET_DELETE_ID,_0x4042d7=DATA[_0x4f3129],_0x39c230=new Date()[_0x7bf114(0x268)]()[_0x7bf114(0x213)]('T')[0x0],_0xd8b771=MODES[CURRENT_MODE];let _0x48f4a8=_0x4042d7['created_at']&&_0x4042d7['created_at']['startsWith'](_0x39c230);db['child'](_0x4f3129)[_0x7bf114(0x1fa)]()['then'](()=>{const _0x34328b=_0x7bf114;_0x48f4a8?payRef[_0x34328b(0x20e)](_0x4042d7[_0x34328b(0x25b)])[_0x34328b(0x245)]('value',_0x4b9e58=>{const _0x4a1f28=_0x34328b;let _0x2f7ec6=_0x4b9e58[_0x4a1f28(0x27a)]()||0x0;payRef[_0x4a1f28(0x20e)](_0x4042d7[_0x4a1f28(0x25b)])['set'](Math[_0x4a1f28(0x22d)](0x0,_0x2f7ec6-_0xd8b771[_0x4a1f28(0x221)])),showToast(_0x4a1f28(0x242));}):showToast('License\x20Deleted\x20Permanently'),closeDeleteModal();});}function copyKey(_0x544855){const _0x59efe1=_0x8830ec;navigator[_0x59efe1(0x264)][_0x59efe1(0x247)](_0x544855)['then'](()=>showToast(_0x59efe1(0x241)));}
 </script>
-
 </body>
 </html>
